@@ -1,0 +1,56 @@
+@import url('https://fonts.cdnfonts.com/css/pp-neue-montreal');
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Theme variables */
+
+@theme {
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-bg: var(--color-bg);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --font-sans: 'PP Neue Montreal', sans-serif;
+}
+
+/* Light theme */
+:root {
+    color-scheme: light;
+    --color-primary: #6366f1;
+    --color-secondary: #f59e42;
+    --color-background: #f9fafb;
+    --color-text-primary: #3d4046;
+    --color-text-secondary: #727272;
+    --color-border-primary: #6366f1;
+    --color-border-secondary: #f59e42;
+    --color-border-neutral: #626262;
+  }
+  
+  /* Dark theme */
+  .dark {
+    color-scheme: dark;
+    --color-primary: #818cf8;
+    --color-secondary: #fb923c;
+    --color-background: #18181b; 
+    --color-text-primary: #f1f5f9;
+    --color-text-secondary: #d1d1d1;
+    --color-border-neutral: #626262;
+  }
+    
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+  }
+}
+
+
+.full-bleed {
+  @apply max-w-screen w-full;
+}
+
+/* Hide scrollbar for webkit browsers */
+.overflow-x-auto::-webkit-scrollbar {
+  display: none;
+}

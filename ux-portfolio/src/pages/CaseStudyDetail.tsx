@@ -48,7 +48,7 @@ export default function CaseStudyDetail() {
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="bg-background max-w-none p-0 pt-32"
+      className="bg-background max-w-none py-32"
     >
       <CaseStudyHero caseStudy={caseStudy} />
 

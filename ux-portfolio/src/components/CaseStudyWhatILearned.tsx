@@ -89,7 +89,7 @@ export default function CaseStudyWhatILearned({ caseStudy }: CaseStudyWhatILearn
   const { ref: sectionRef, isIntersecting: sectionVisible } = useIntersectionObserver();
 
   return (
-    <section className="py-16 lg:py-24 bg-white dark:bg-zinc-950">
+    <section className="py-16 lg:py-24 bg-background dark:bg-background">
       <div 
         ref={sectionRef}
         className={`max-w-6xl mx-auto px-6 transition-all duration-700 ease-out ${

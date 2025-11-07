@@ -16,6 +16,7 @@ export default function ScrollspyNav({ sections, heroHeight = 600 }: ScrollspyNa
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [backgroundStyle, setBackgroundStyle] = useState({ left: 0, width: 0, opacity: 0 });
+  const isManualScrolling = useRef(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,35 +25,44 @@ export default function ScrollspyNav({ sections, heroHeight = 600 }: ScrollspyNa
       // Show nav after scrolling past hero section
       setIsVisible(scrollY > heroHeight);
 
+      // Skip section detection if manually scrolling
+      if (isManualScrolling.current) {
+        return;
+      }
+
       // Determine active section
       const sectionElements = sections.map(section => ({
         id: section.id,
         element: document.getElementById(section.id)
-      }));
+      })).filter(section => section.element !== null);
 
       let currentSection = '';
       let currentSectionIndex = -1;
       const scrollPosition = scrollY + 100; // Offset for better UX
 
-      for (let i = 0; i < sectionElements.length; i++) {
+      // Find the section that's currently in view
+      for (let i = sectionElements.length - 1; i >= 0; i--) {
         const section = sectionElements[i];
         if (section.element) {
           const sectionTop = section.element.offsetTop;
-          const sectionBottom = sectionTop + section.element.offsetHeight;
           
-          if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+          if (scrollPosition >= sectionTop) {
             currentSection = section.id;
-            currentSectionIndex = i;
+            // Find the original index in the sections array
+            currentSectionIndex = sections.findIndex(s => s.id === section.id);
             break;
           }
         }
       }
 
-      setActiveSection(currentSection);
-      setActiveSectionIndex(currentSectionIndex);
+      // Only update if we actually found a section
+      if (currentSection && currentSectionIndex >= 0) {
+        setActiveSection(currentSection);
+        setActiveSectionIndex(currentSectionIndex);
+      }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll(); // Initial check
 
     return () => window.removeEventListener('scroll', handleScroll);
@@ -61,14 +71,19 @@ export default function ScrollspyNav({ sections, heroHeight = 600 }: ScrollspyNa
   // Update background position when active section changes
   useEffect(() => {
     const updateBackgroundPosition = () => {
-      if (activeSectionIndex >= 0 && buttonRefs.current[activeSectionIndex]) {
+      if (activeSectionIndex >= 0 && buttonRefs.current[activeSectionIndex] && scrollContainerRef.current) {
         const activeButton = buttonRefs.current[activeSectionIndex];
-        const containerRect = activeButton.parentElement?.getBoundingClientRect();
+        const container = scrollContainerRef.current;
+        
+        // Use container's scroll position for accurate positioning
+        const containerRect = container.getBoundingClientRect();
         const buttonRect = activeButton.getBoundingClientRect();
         
         if (containerRect) {
+          const relativeLeft = buttonRect.left - containerRect.left + container.scrollLeft;
+          
           setBackgroundStyle({
-            left: buttonRect.left - containerRect.left,
+            left: relativeLeft,
             width: buttonRect.width,
             opacity: 1
           });
@@ -78,14 +93,16 @@ export default function ScrollspyNav({ sections, heroHeight = 600 }: ScrollspyNa
       }
     };
 
-    // Small delay to ensure DOM has updated
-    const timeoutId = setTimeout(updateBackgroundPosition, 10);
+    // Use requestAnimationFrame for smoother updates
+    const rafId = requestAnimationFrame(() => {
+      updateBackgroundPosition();
+    });
     
     // Also update on window resize
     window.addEventListener('resize', updateBackgroundPosition);
     
     return () => {
-      clearTimeout(timeoutId);
+      cancelAnimationFrame(rafId);
       window.removeEventListener('resize', updateBackgroundPosition);
     };
   }, [activeSectionIndex, isVisible]);
@@ -122,6 +139,9 @@ export default function ScrollspyNav({ sections, heroHeight = 600 }: ScrollspyNa
   }, [activeSectionIndex]);
 
   const scrollToSection = (sectionId: string, index: number) => {
+    // Set manual scrolling flag to prevent scroll handler interference
+    isManualScrolling.current = true;
+    
     setActiveSection(sectionId);
     setActiveSectionIndex(index);
     
@@ -134,6 +154,14 @@ export default function ScrollspyNav({ sections, heroHeight = 600 }: ScrollspyNa
         top: elementPosition,
         behavior: 'smooth'
       });
+      
+      // Reset manual scrolling flag after animation completes
+      setTimeout(() => {
+        isManualScrolling.current = false;
+      }, 1000);
+    } else {
+      // Reset flag immediately if element not found
+      isManualScrolling.current = false;
     }
   };
 
@@ -154,7 +182,7 @@ export default function ScrollspyNav({ sections, heroHeight = 600 }: ScrollspyNa
         >
           <div 
             ref={scrollContainerRef}
-            className="relative flex items-center gap-1 px-4 md:px-4 py-3 justify-start md:justify-start overflow-x-auto md:overflow-x-visible"
+            className="relative flex items-center gap-1 px-4 md:px-4 py-3 justify-start sm:justify-center overflow-x-auto md:overflow-x-visible"
             style={{
               scrollbarWidth: 'none', /* Firefox */
               msOverflowStyle: 'none', /* IE and Edge */
@@ -184,7 +212,7 @@ export default function ScrollspyNav({ sections, heroHeight = 600 }: ScrollspyNa
             {sections.map((section, index) => (
               <button
                 key={section.id}
-                ref={(el) => buttonRefs.current[index] = el}
+                ref={(el) => { buttonRefs.current[index] = el; }}
                 onClick={() => scrollToSection(section.id, index)}
                 className="relative px-4 py-2 text-sm font-medium rounded-full transition-colors duration-300 ease-out cursor-pointer z-10 whitespace-nowrap flex-shrink-0"
                 aria-label={`Go to ${section.label} section`}

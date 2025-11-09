@@ -8,9 +8,12 @@ import CaseStudyDetail from "./pages/CaseStudyDetail";
 import ComponentTest from "./pages/ComponentTest";
 import Prototypes from "./pages/Prototypes";
 
+// Get base path from Vite config or environment
+const basePath = import.meta.env.BASE_URL || '/';
+
 function AppContent() {
   const location = useLocation();
-  const isPrototypePage = location.pathname.startsWith("/prototypes");
+  const isPrototypePage = location.pathname.startsWith("/prototypes") || location.pathname.startsWith(`${basePath}prototypes`);
 
   return (
     <div className="min-h-screen bg-background dark:bg-background transition-colors">
@@ -37,7 +40,7 @@ function AppContent() {
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basePath}>
       <AppContent />
     </BrowserRouter>
   );

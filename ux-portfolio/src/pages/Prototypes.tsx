@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { WasatchDashboard } from "./prototypes/wasatch";
 
 // This page houses interactive prototypes for design showcasing
@@ -65,15 +65,15 @@ function PrototypeCard({
   description: string;
 }) {
   return (
-    <a
-      href={`/prototypes/${id}`}
+    <Link
+      to={`/prototypes/${id}`}
       className="block p-6 border border-border dark:border-border rounded-lg hover:bg-accent dark:hover:bg-accent transition-colors"
     >
       <h2 className="text-2xl font-semibold mb-2 text-text dark:text-text">
         {title}
       </h2>
       <p className="text-text dark:text-text opacity-80">{description}</p>
-    </a>
+    </Link>
   );
 }
 
@@ -82,12 +82,12 @@ function ExamplePrototype() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-6xl">
       <div className="mb-8">
-        <a
-          href="/prototypes"
+        <Link
+          to="/prototypes"
           className="text-text dark:text-text hover:underline"
         >
           ← Back to prototypes
-        </a>
+        </Link>
       </div>
       <h1 className="text-4xl font-bold mb-8 text-text dark:text-text">
         Example Prototype

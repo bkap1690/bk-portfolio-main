@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { MoreVertical, Plus } from "lucide-react";
 import { getProjectDetail } from "../data/projectDetailData";
-import type { ProjectDetail } from "../data/projectDetailData";
 
 type TabType = "overview" | "orders" | "batches" | "samples" | "documents" | "activity";
 

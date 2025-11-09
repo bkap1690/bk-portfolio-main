@@ -12,7 +12,7 @@ function useActiveSection(sectionsCount: number) {
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    let throttleTimeout: NodeJS.Timeout | null = null;
+    let throttleTimeout: ReturnType<typeof setTimeout> | null = null;
 
     const handleScroll = () => {
       if (throttleTimeout) return;
@@ -121,7 +121,7 @@ function StickyInsight({
   );
 }
 
-export default function CaseStudyResearchInsights({ caseStudy }: CaseStudyResearchInsightsProps) {
+export default function CaseStudyResearchInsights({ caseStudy: _caseStudy }: CaseStudyResearchInsightsProps) {
   // Placeholder research insights data
   const researchInsights = [
     {

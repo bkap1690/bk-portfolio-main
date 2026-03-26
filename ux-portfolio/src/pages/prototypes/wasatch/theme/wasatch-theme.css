@@ -1,0 +1,209 @@
+/* Wasatch BioLabs Design Tokens - Single Source of Truth */
+
+:root {
+  /* === Color: Brand === */
+  --wasatch-primary: #776fe5;
+  --wasatch-primary-hover: #5f58c4;
+  --wasatch-primary-muted: rgb(119 111 229 / 0.1);
+  --wasatch-accent: #5dbfb3;
+  --wasatch-accent-hover: #4da89d;
+  --wasatch-border-focus: #5dbfb3;
+
+  /* === Color: Backgrounds === */
+  --wasatch-bg: #f9f9f6;
+  --wasatch-bg-elevated: #f1f1ec;
+  --wasatch-surface: #ffffff;
+  --wasatch-surface-subtle: #f9fafb;
+
+  /* === Color: Neutrals (text hierarchy, borders, surfaces) === */
+  --wasatch-neutral-50: #f9fafb;
+  --wasatch-neutral-100: #f3f4f6;
+  --wasatch-neutral-200: #e5e7eb;
+  --wasatch-neutral-300: #d1d5db;
+  --wasatch-neutral-400: #9ca3af;
+  --wasatch-neutral-500: #6b7280;
+  --wasatch-neutral-600: #4b5563;
+  --wasatch-neutral-700: #374151;
+  --wasatch-neutral-800: #1f2937;
+  --wasatch-neutral-900: #111827;
+
+  /* === Color: Semantic text === */
+  --wasatch-text-heading: var(--wasatch-neutral-900);
+  --wasatch-text-body: var(--wasatch-neutral-900);
+  --wasatch-text-secondary: var(--wasatch-neutral-600);
+  --wasatch-text-muted: var(--wasatch-neutral-500);
+  --wasatch-text-placeholder: var(--wasatch-neutral-400);
+  --wasatch-text-inverse: #ffffff;
+
+  /* === Color: Borders === */
+  --wasatch-border: var(--wasatch-neutral-200);
+  --wasatch-border-strong: var(--wasatch-neutral-300);
+
+  /* === Color: Semantic status (badges, alerts) === */
+  --wasatch-status-success: #15803d;
+  --wasatch-status-success-bg: #dcfce7;
+  --wasatch-status-success-border: #bbf7d0;
+  --wasatch-status-warning: #a16207;
+  --wasatch-status-warning-bg: #fef9c3;
+  --wasatch-status-warning-border: #fef08a;
+  --wasatch-status-error: #b91c1c;
+  --wasatch-status-error-bg: #fee2e2;
+  --wasatch-status-error-border: #fecaca;
+  --wasatch-status-info: #1d4ed8;
+  --wasatch-status-info-bg: #dbeafe;
+  --wasatch-status-info-border: #bfdbfe;
+  --wasatch-status-purple: #6d28d9;
+  --wasatch-status-purple-bg: #ede9fe;
+  --wasatch-status-purple-border: #ddd6fe;
+
+  /* === Typography: Font family === */
+  --wasatch-font-sans: "Roboto", sans-serif;
+
+  /* === Typography: Font sizes (px → rem) === */
+  --wasatch-text-xs: 0.75rem;     /* 12px */
+  --wasatch-text-sm: 0.875rem;    /* 14px */
+  --wasatch-text-base: 1rem;      /* 16px */
+  --wasatch-text-lg: 1.125rem;    /* 18px */
+  --wasatch-text-xl: 1.25rem;     /* 20px */
+  --wasatch-text-2xl: 1.5rem;     /* 24px */
+  --wasatch-text-3xl: 1.875rem;   /* 30px */
+  --wasatch-text-4xl: 2.25rem;    /* 36px */
+
+  /* === Typography: Font weights === */
+  --wasatch-font-normal: 400;
+  --wasatch-font-medium: 500;
+  --wasatch-font-semibold: 600;
+  --wasatch-font-bold: 700;
+
+  /* === Typography: Line heights === */
+  --wasatch-leading-tight: 1.25;
+  --wasatch-leading-normal: 1.5;
+  --wasatch-leading-relaxed: 1.75;
+
+  /* === Spacing (semantic) === */
+  --wasatch-space-1: 0.25rem;   /* 4px */
+  --wasatch-space-2: 0.5rem;    /* 8px */
+  --wasatch-space-3: 0.75rem;   /* 12px */
+  --wasatch-space-4: 1rem;      /* 16px */
+  --wasatch-space-5: 1.25rem;   /* 20px */
+  --wasatch-space-6: 1.5rem;    /* 24px */
+  --wasatch-space-8: 2rem;      /* 32px */
+  --wasatch-space-10: 2.5rem;   /* 40px */
+  --wasatch-space-12: 3rem;     /* 48px */
+  --wasatch-space-16: 4rem;     /* 64px */
+
+  /* === Radius === */
+  --wasatch-radius-sm: 6px;
+  --wasatch-radius-md: 8px;
+  --wasatch-radius-lg: 12px;
+  --wasatch-radius-full: 9999px;
+
+  /* === Shadows === */
+  --wasatch-shadow-card-hover: 0 10px 15px -3px rgb(119 111 229 / 0.15);
+  --wasatch-shadow-modal-top: 0 -4px 4px -1px rgba(0, 0, 0, 0.1);
+  --wasatch-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --wasatch-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --wasatch-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Tailwind v4 @theme - generates utilities */
+@theme {
+  /* Brand colors */
+  --color-wasatch-primary: var(--wasatch-primary);
+  --color-wasatch-primary-hover: var(--wasatch-primary-hover);
+  --color-wasatch-primary-muted: var(--wasatch-primary-muted);
+  --color-wasatch-accent: var(--wasatch-accent);
+  --color-wasatch-accent-hover: var(--wasatch-accent-hover);
+  --color-wasatch-border-focus: var(--wasatch-border-focus);
+
+  /* Backgrounds */
+  --color-wasatch-bg: var(--wasatch-bg);
+  --color-wasatch-bg-elevated: var(--wasatch-bg-elevated);
+  --color-wasatch-surface: var(--wasatch-surface);
+  --color-wasatch-surface-subtle: var(--wasatch-surface-subtle);
+
+  /* Neutrals */
+  --color-wasatch-neutral-50: var(--wasatch-neutral-50);
+  --color-wasatch-neutral-100: var(--wasatch-neutral-100);
+  --color-wasatch-neutral-200: var(--wasatch-neutral-200);
+  --color-wasatch-neutral-300: var(--wasatch-neutral-300);
+  --color-wasatch-neutral-400: var(--wasatch-neutral-400);
+  --color-wasatch-neutral-500: var(--wasatch-neutral-500);
+  --color-wasatch-neutral-600: var(--wasatch-neutral-600);
+  --color-wasatch-neutral-700: var(--wasatch-neutral-700);
+  --color-wasatch-neutral-800: var(--wasatch-neutral-800);
+  --color-wasatch-neutral-900: var(--wasatch-neutral-900);
+
+  /* Semantic text colors */
+  --color-wasatch-text-heading: var(--wasatch-text-heading);
+  --color-wasatch-text-body: var(--wasatch-text-body);
+  --color-wasatch-text-secondary: var(--wasatch-text-secondary);
+  --color-wasatch-text-muted: var(--wasatch-text-muted);
+  --color-wasatch-text-placeholder: var(--wasatch-text-placeholder);
+  --color-wasatch-text-inverse: var(--wasatch-text-inverse);
+
+  /* Borders */
+  --color-wasatch-border: var(--wasatch-border);
+  --color-wasatch-border-strong: var(--wasatch-border-strong);
+
+  /* Status */
+  --color-wasatch-status-success: var(--wasatch-status-success);
+  --color-wasatch-status-success-bg: var(--wasatch-status-success-bg);
+  --color-wasatch-status-success-border: var(--wasatch-status-success-border);
+  --color-wasatch-status-warning: var(--wasatch-status-warning);
+  --color-wasatch-status-warning-bg: var(--wasatch-status-warning-bg);
+  --color-wasatch-status-warning-border: var(--wasatch-status-warning-border);
+  --color-wasatch-status-error: var(--wasatch-status-error);
+  --color-wasatch-status-error-bg: var(--wasatch-status-error-bg);
+  --color-wasatch-status-error-border: var(--wasatch-status-error-border);
+  --color-wasatch-status-info: var(--wasatch-status-info);
+  --color-wasatch-status-info-bg: var(--wasatch-status-info-bg);
+  --color-wasatch-status-info-border: var(--wasatch-status-info-border);
+  --color-wasatch-status-purple: var(--wasatch-status-purple);
+  --color-wasatch-status-purple-bg: var(--wasatch-status-purple-bg);
+  --color-wasatch-status-purple-border: var(--wasatch-status-purple-border);
+
+  /* Font family */
+  --font-wasatch-sans: var(--wasatch-font-sans);
+
+  /* Font sizes */
+  --text-wasatch-xs: var(--wasatch-text-xs);
+  --text-wasatch-sm: var(--wasatch-text-sm);
+  --text-wasatch-base: var(--wasatch-text-base);
+  --text-wasatch-lg: var(--wasatch-text-lg);
+  --text-wasatch-xl: var(--wasatch-text-xl);
+  --text-wasatch-2xl: var(--wasatch-text-2xl);
+  --text-wasatch-3xl: var(--wasatch-text-3xl);
+  --text-wasatch-4xl: var(--wasatch-text-4xl);
+
+  /* Font weights */
+  --font-wasatch-normal: var(--wasatch-font-normal);
+  --font-wasatch-medium: var(--wasatch-font-medium);
+  --font-wasatch-semibold: var(--wasatch-font-semibold);
+  --font-wasatch-bold: var(--wasatch-font-bold);
+
+  /* Spacing */
+  --spacing-wasatch-1: var(--wasatch-space-1);
+  --spacing-wasatch-2: var(--wasatch-space-2);
+  --spacing-wasatch-3: var(--wasatch-space-3);
+  --spacing-wasatch-4: var(--wasatch-space-4);
+  --spacing-wasatch-5: var(--wasatch-space-5);
+  --spacing-wasatch-6: var(--wasatch-space-6);
+  --spacing-wasatch-8: var(--wasatch-space-8);
+  --spacing-wasatch-10: var(--wasatch-space-10);
+  --spacing-wasatch-12: var(--wasatch-space-12);
+  --spacing-wasatch-16: var(--wasatch-space-16);
+
+  /* Radius */
+  --radius-wasatch-sm: var(--wasatch-radius-sm);
+  --radius-wasatch-md: var(--wasatch-radius-md);
+  --radius-wasatch-lg: var(--wasatch-radius-lg);
+  --radius-wasatch-full: var(--wasatch-radius-full);
+
+  /* Shadows */
+  --shadow-wasatch-card-hover: var(--wasatch-shadow-card-hover);
+  --shadow-wasatch-modal-top: var(--wasatch-shadow-modal-top);
+  --shadow-wasatch-sm: var(--wasatch-shadow-sm);
+  --shadow-wasatch-md: var(--wasatch-shadow-md);
+  --shadow-wasatch-lg: var(--wasatch-shadow-lg);
+}

@@ -1,3 +1,5 @@
+import { wasatchTokens } from "../theme/tokens";
+
 // Types for Project Detail Page Data
 export interface ProjectDetailStats {
   totalOrders: number;
@@ -62,7 +64,7 @@ export const projectDetailData: ProjectDetailData = {
           name: "Dr. Emily Johnson",
           role: "Project Manager",
           initials: "EJ",
-          avatarColor: "#776FE5"
+          avatarColor: wasatchTokens.primary
         },
         {
           id: "member-2",

@@ -1,0 +1,42 @@
+/* Wasatch semantic component utilities - uses only design tokens */
+
+@layer components {
+  .btn-accent {
+    @apply rounded-wasatch-sm px-wasatch-4 py-wasatch-2 text-wasatch-sm font-wasatch-medium text-wasatch-text-inverse transition-colors;
+    @apply bg-wasatch-accent hover:bg-wasatch-accent-hover;
+  }
+
+  .btn-primary {
+    @apply rounded-wasatch-sm px-wasatch-4 py-wasatch-2 text-wasatch-sm font-wasatch-medium transition-colors;
+    @apply bg-wasatch-primary text-wasatch-text-inverse hover:opacity-90;
+  }
+
+  .btn-primary-outline {
+    @apply rounded-wasatch-sm border px-wasatch-4 py-wasatch-2 text-wasatch-sm font-wasatch-medium transition-colors;
+    @apply border-wasatch-primary text-wasatch-primary;
+    @apply hover:bg-wasatch-primary hover:text-wasatch-text-inverse;
+  }
+
+  .link-primary {
+    @apply text-wasatch-sm text-wasatch-primary hover:text-wasatch-primary-hover hover:underline;
+  }
+
+  .input-focus {
+    @apply focus:outline-none focus:ring-2 focus:ring-wasatch-accent focus:ring-offset-0;
+  }
+
+  .card {
+    @apply rounded-wasatch-md border border-wasatch-border bg-wasatch-bg;
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 ease-in-out;
+    @apply hover:translate-y-[-2px] hover:shadow-wasatch-card-hover hover:border-wasatch-primary/30;
+  }
+
+  /* Typography utilities */
+  .text-wasatch-heading { @apply text-wasatch-text-heading; }
+  .text-wasatch-body { @apply text-wasatch-text-body; }
+  .text-wasatch-secondary { @apply text-wasatch-text-secondary; }
+  .text-wasatch-muted { @apply text-wasatch-text-muted; }
+}

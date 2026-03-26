@@ -1,0 +1,25 @@
+/** Wasatch design tokens for JS/TS usage (e.g. inline styles, avatar colors) */
+
+export const wasatchTokens = {
+  primary: "#776fe5",
+  primaryHover: "#5f58c4",
+  accent: "#5dbfb3",
+  accentHover: "#4da89d",
+  bg: "#f9f9f6",
+  bgElevated: "#f1f1ec",
+  surface: "#ffffff",
+  textHeading: "#111827",
+  textBody: "#111827",
+  textSecondary: "#4b5563",
+  textMuted: "#6b7280",
+  neutral50: "#f9fafb",
+  neutral100: "#f3f4f6",
+  neutral200: "#e5e7eb",
+  neutral300: "#d1d5db",
+  neutral400: "#9ca3af",
+  neutral500: "#6b7280",
+  neutral600: "#4b5563",
+  neutral700: "#374151",
+  neutral800: "#1f2937",
+  neutral900: "#111827",
+} as const;

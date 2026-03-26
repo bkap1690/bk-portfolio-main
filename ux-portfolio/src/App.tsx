@@ -7,6 +7,8 @@ import Contact from "./pages/Contact";
 import CaseStudyDetail from "./pages/CaseStudyDetail";
 import ComponentTest from "./pages/ComponentTest";
 import Prototypes from "./pages/Prototypes";
+import AccountCreationFlow from "./pages/prototypes/wasatch/pages/AccountCreationFlow";
+import AccountSuccessPage from "./pages/prototypes/wasatch/pages/AccountSuccessPage";
 
 // Get base path from Vite config or environment
 const basePath = import.meta.env.BASE_URL || '/';
@@ -32,6 +34,8 @@ function AppContent() {
           <Route path="/test" element={<ComponentTest />} />
           <Route path="/prototypes" element={<Prototypes />} />
           <Route path="/prototypes/:prototypeId" element={<Prototypes />} />
+          <Route path="/prototypes/wasatch-signup" element={<AccountCreationFlow />} />
+          <Route path="/prototypes/wasatch-success" element={<AccountSuccessPage />} />
         </Routes>
       </main>
     </div>

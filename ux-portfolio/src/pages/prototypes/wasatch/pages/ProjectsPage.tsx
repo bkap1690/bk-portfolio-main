@@ -1,17 +1,19 @@
-import { useState, useRef, useEffect } from "react";
-import { Search, Filter, Grid3x3, Table as TableIcon, Columns } from "lucide-react";
+import { useState } from "react";
+import { Search, Filter, Grid3x3, Table as TableIcon, Columns, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import TabBar from "../components/TabBar";
 import { projectsData } from "../data/projectsData";
 import type { ProjectCard } from "../data/projectsData";
+import { getProjectDetail } from "../data/projectDetailData";
 
 type TabType = "all" | "active" | "completed" | "archived";
 type ViewType = "grid" | "table" | "kanban";
 
 interface ProjectsPageProps {
   onProjectClick?: (projectId: string) => void;
-  onBreadcrumbClick?: (target: "home" | "projects") => void;
 }
 
-export default function ProjectsPage({ onProjectClick, onBreadcrumbClick }: ProjectsPageProps) {
+export default function ProjectsPage({ onProjectClick }: ProjectsPageProps) {
   const [activeTab, setActiveTab] = useState<TabType>("all");
   const [viewType, setViewType] = useState<ViewType>("grid");
   const [searchQuery, setSearchQuery] = useState("");
@@ -19,42 +21,7 @@ export default function ProjectsPage({ onProjectClick, onBreadcrumbClick }: Proj
   const [projects, setProjects] = useState(projectsData.projects);
   const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
-  
-  // Refs for tab buttons to calculate underline position
-  const tabRefs = {
-    all: useRef<HTMLButtonElement>(null),
-    active: useRef<HTMLButtonElement>(null),
-    completed: useRef<HTMLButtonElement>(null),
-    archived: useRef<HTMLButtonElement>(null),
-  };
-  const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0 });
-  
-  // Update underline position when activeTab changes
-  useEffect(() => {
-    const updateUnderline = () => {
-      const activeTabRef = tabRefs[activeTab].current;
-      if (activeTabRef) {
-        const tabContainer = activeTabRef.parentElement;
-        if (tabContainer) {
-          const containerLeft = tabContainer.getBoundingClientRect().left;
-          const tabLeft = activeTabRef.getBoundingClientRect().left;
-          const tabWidth = activeTabRef.offsetWidth;
-          
-          setUnderlineStyle({
-            left: tabLeft - containerLeft,
-            width: tabWidth,
-          });
-        }
-      }
-    };
-    
-    // Initial position
-    updateUnderline();
-    
-    // Update on window resize
-    window.addEventListener('resize', updateUnderline);
-    return () => window.removeEventListener('resize', updateUnderline);
-  }, [activeTab]);
+  const [quickViewProjectId, setQuickViewProjectId] = useState<string | null>(null);
 
   // Filter projects based on active tab
   const filteredProjects = projects.filter((project) => {
@@ -142,89 +109,30 @@ export default function ProjectsPage({ onProjectClick, onBreadcrumbClick }: Proj
   };
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: "'Roboto', sans-serif" }}>
-      {/* Breadcrumb */}
-      <div className="border-b border-gray-200 bg-white px-6 py-4">
-        <div className="flex items-center gap-2 text-sm">
-          <span 
-            onClick={() => onBreadcrumbClick?.("home")}
-            className="text-gray-600 cursor-pointer hover:text-gray-800 transition-colors"
-          >
-            Home
-          </span>
-          <span className="text-gray-400">›</span>
-          <span className="font-medium text-gray-800">Projects</span>
-        </div>
-      </div>
-
+    <div className="wasatch-app min-h-screen bg-wasatch-surface font-wasatch-sans">
       {/* Main Content */}
-      <div className="px-6 py-6">
+      <div className="px-wasatch-6 py-wasatch-6">
         {/* Page Title */}
-        <h1 className="mb-6 text-3xl font-normal text-gray-900">Projects</h1>
+        <h1 className="mb-wasatch-6 text-wasatch-3xl font-wasatch-normal text-wasatch-text-heading">Projects</h1>
 
         {/* Tabs */}
-        <div className="mb-6 border-b border-gray-200">
-          <div className="relative flex gap-8">
-            <button
-              ref={tabRefs.all}
-              onClick={() => setActiveTab("all")}
-              className={`pb-3 text-sm font-medium transition-colors ${
-                activeTab === "all"
-                  ? "text-gray-900"
-                  : "text-gray-600 hover:text-gray-900 cursor-pointer"
-              }`}
-            >
-              All Projects
-            </button>
-            <button
-              ref={tabRefs.active}
-              onClick={() => setActiveTab("active")}
-              className={`pb-3 text-sm font-medium transition-colors ${
-                activeTab === "active"
-                  ? "text-gray-900"
-                  : "text-gray-600 hover:text-gray-900 cursor-pointer"
-              }`}
-            >
-              Active
-            </button>
-            <button
-              ref={tabRefs.completed}
-              onClick={() => setActiveTab("completed")}
-              className={`pb-3 text-sm font-medium transition-colors ${
-                activeTab === "completed"
-                  ? "text-gray-900"
-                  : "text-gray-600 hover:text-gray-900 cursor-pointer"
-              }`}
-            >
-              Completed
-            </button>
-            <button
-              ref={tabRefs.archived}
-              onClick={() => setActiveTab("archived")}
-              className={`pb-3 text-sm font-medium transition-colors ${
-                activeTab === "archived"
-                  ? "text-gray-900"
-                  : "text-gray-600 hover:text-gray-900 cursor-pointer"
-              }`}
-            >
-              Archived
-            </button>
-            {/* Animated underline */}
-            <div
-              className="absolute bottom-0 h-[2px] bg-gray-900 transition-all duration-300 ease-in-out"
-              style={{
-                left: `${underlineStyle.left}px`,
-                width: `${underlineStyle.width}px`,
-              }}
-            />
-          </div>
-        </div>
+        <TabBar
+          className="mb-wasatch-6"
+          tabs={[
+            { id: "all", label: "All Projects" },
+            { id: "active", label: "Active" },
+            { id: "completed", label: "Completed" },
+            { id: "archived", label: "Archived" },
+          ]}
+          activeTab={activeTab}
+          onChange={setActiveTab}
+        />
 
         {/* Search Bar and View Toggle */}
-        <div className="mb-6 flex gap-3">
+        <div className="mb-wasatch-6 flex gap-wasatch-3">
           <div className="relative flex-1">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-wasatch-3 top-1/2 -translate-y-1/2 text-wasatch-text-placeholder"
               size={18}
             />
             <input
@@ -232,25 +140,25 @@ export default function ProjectsPage({ onProjectClick, onBreadcrumbClick }: Proj
               placeholder="Search for project name, ID, status, or associated representative"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm focus:border-teal-500 focus:outline-none"
+              className="w-full rounded-wasatch-sm border border-wasatch-border-strong bg-wasatch-surface py-wasatch-2 pl-wasatch-10 pr-wasatch-4 text-wasatch-sm focus:border-wasatch-accent focus:outline-none"
             />
           </div>
-          <button className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+          <button className="flex items-center gap-wasatch-2 rounded-wasatch-sm border border-wasatch-border-strong bg-wasatch-surface px-wasatch-4 py-wasatch-2 text-wasatch-sm font-wasatch-medium text-wasatch-text-secondary transition-colors hover:bg-wasatch-surface-subtle">
             Search
           </button>
-          <button className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+          <button className="flex items-center gap-wasatch-2 rounded-wasatch-sm border border-wasatch-border-strong bg-wasatch-surface px-wasatch-4 py-wasatch-2 text-wasatch-sm font-wasatch-medium text-wasatch-text-secondary transition-colors hover:bg-wasatch-surface-subtle">
             <Filter size={16} />
             Filter results
           </button>
           
           {/* View Toggle */}
-          <div className="flex items-center gap-1 rounded-md border border-gray-300 bg-white p-1">
+          <div className="flex items-center gap-wasatch-1 rounded-wasatch-sm border border-wasatch-border-strong bg-wasatch-surface p-wasatch-1">
             <button
               onClick={() => setViewType("grid")}
-              className={`rounded p-2 transition-colors ${
+              className={`rounded-wasatch-sm p-wasatch-2 transition-colors ${
                 viewType === "grid"
-                  ? "bg-gray-100 text-gray-900"
-                  : "text-gray-600 hover:bg-gray-50"
+                  ? "bg-wasatch-neutral-100 text-wasatch-text-heading"
+                  : "text-wasatch-text-secondary hover:bg-wasatch-surface-subtle"
               }`}
               title="Grid View"
             >
@@ -258,10 +166,10 @@ export default function ProjectsPage({ onProjectClick, onBreadcrumbClick }: Proj
             </button>
             <button
               onClick={() => setViewType("table")}
-              className={`rounded p-2 transition-colors ${
+              className={`rounded-wasatch-sm p-wasatch-2 transition-colors ${
                 viewType === "table"
-                  ? "bg-gray-100 text-gray-900"
-                  : "text-gray-600 hover:bg-gray-50"
+                  ? "bg-wasatch-neutral-100 text-wasatch-text-heading"
+                  : "text-wasatch-text-secondary hover:bg-wasatch-surface-subtle"
               }`}
               title="Table View"
             >
@@ -269,10 +177,10 @@ export default function ProjectsPage({ onProjectClick, onBreadcrumbClick }: Proj
             </button>
             <button
               onClick={() => setViewType("kanban")}
-              className={`rounded p-2 transition-colors ${
+              className={`rounded-wasatch-sm p-wasatch-2 transition-colors ${
                 viewType === "kanban"
-                  ? "bg-gray-100 text-gray-900"
-                  : "text-gray-600 hover:bg-gray-50"
+                  ? "bg-wasatch-neutral-100 text-wasatch-text-heading"
+                  : "text-wasatch-text-secondary hover:bg-wasatch-surface-subtle"
               }`}
               title="Kanban View"
             >
@@ -282,51 +190,96 @@ export default function ProjectsPage({ onProjectClick, onBreadcrumbClick }: Proj
         </div>
 
         {/* Conditional View Rendering */}
-        {viewType === "grid" && (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {displayedProjects.map((project) => (
-              <ProjectCardComponent
-                key={project.id}
-                project={project}
-                isSelected={selectedProjects.has(project.id)}
+        <AnimatePresence mode="wait">
+          {viewType === "grid" && (
+            <motion.div
+              key="grid"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="grid grid-cols-1 gap-wasatch-4 md:grid-cols-2 lg:grid-cols-3"
+            >
+              {displayedProjects.map((project, i) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.22, ease: "easeOut", delay: i * 0.06 }}
+                >
+                  <ProjectCardComponent
+                    project={project}
+                    isSelected={selectedProjects.has(project.id)}
+                    onCheckboxChange={handleCheckboxChange}
+                    onProjectClick={onProjectClick}
+                    onQuickView={(projectId) => setQuickViewProjectId(projectId)}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+
+          {viewType === "table" && (
+            <motion.div
+              key="table"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+            >
+              <TableView
+                projects={displayedProjects}
+                selectedProjects={selectedProjects}
                 onCheckboxChange={handleCheckboxChange}
                 onProjectClick={onProjectClick}
+                onQuickView={(projectId) => setQuickViewProjectId(projectId)}
               />
-            ))}
-          </div>
-        )}
+            </motion.div>
+          )}
 
-        {viewType === "table" && (
-          <TableView
-            projects={displayedProjects}
-            selectedProjects={selectedProjects}
-            onCheckboxChange={handleCheckboxChange}
-            onProjectClick={onProjectClick}
-          />
-        )}
-
-        {viewType === "kanban" && (
-          <KanbanView
-            projects={displayedProjects}
-            onProjectClick={onProjectClick}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
-            onDragEnterColumn={handleDragEnterColumn}
-            onDragLeaveColumn={handleDragLeaveColumn}
-            draggedProjectId={draggedProjectId}
-            dragOverColumn={dragOverColumn}
-          />
-        )}
+          {viewType === "kanban" && (
+            <motion.div
+              key="kanban"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+            >
+              <KanbanView
+                projects={displayedProjects}
+                onProjectClick={onProjectClick}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onDragEnterColumn={handleDragEnterColumn}
+                onDragLeaveColumn={handleDragLeaveColumn}
+                draggedProjectId={draggedProjectId}
+                dragOverColumn={dragOverColumn}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* No Results */}
         {displayedProjects.length === 0 && (
           <div className="py-12 text-center">
-            <p className="text-gray-500">No projects found matching your criteria.</p>
+            <p className="text-wasatch-text-muted">No projects found matching your criteria.</p>
           </div>
         )}
       </div>
+
+      {/* Quick View Modal */}
+      {quickViewProjectId && (
+        <QuickViewModal
+          projectId={quickViewProjectId}
+          onClose={() => setQuickViewProjectId(null)}
+          onViewFullDetails={() => {
+            setQuickViewProjectId(null);
+            onProjectClick?.(quickViewProjectId);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -337,28 +290,30 @@ function ProjectCardComponent({
   isSelected,
   onCheckboxChange,
   onProjectClick,
+  onQuickView,
 }: {
   project: ProjectCard;
   isSelected: boolean;
   onCheckboxChange: (id: string) => void;
   onProjectClick?: (projectId: string) => void;
+  onQuickView?: (projectId: string) => void;
 }) {
   const statusColorClasses = {
-    green: "bg-green-100 text-green-700 border-green-200",
-    blue: "bg-blue-100 text-blue-700 border-blue-200",
-    yellow: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    gray: "bg-gray-100 text-gray-700 border-gray-200",
+    green: "bg-wasatch-status-success-bg text-wasatch-status-success border-wasatch-status-success-border",
+    blue: "bg-wasatch-status-info-bg text-wasatch-status-info border-wasatch-status-info-border",
+    yellow: "bg-wasatch-status-warning-bg text-wasatch-status-warning border-wasatch-status-warning-border",
+    gray: "bg-wasatch-neutral-100 text-wasatch-text-secondary border-wasatch-border",
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-[#F9F9F6] p-6 transition-all duration-200 ease-in-out hover:translate-y-[-2px] hover:shadow-lg hover:shadow-[#776FE5]/15 hover:border-[#776FE5]/30">
+    <div className="rounded-wasatch-md border border-wasatch-border bg-wasatch-bg p-wasatch-6 transition-all duration-200 ease-in-out hover:translate-y-[-2px] hover:shadow-lg hover:shadow-wasatch-card-hover hover:border-wasatch-primary/30">
       {/* Header Row */}
-      <div className="mb-4 flex items-start justify-between">
+      <div className="mb-wasatch-4 flex items-start justify-between">
         <input
           type="checkbox"
           checked={isSelected}
           onChange={() => onCheckboxChange(project.id)}
-          className="h-4 w-4 rounded border-gray-300 text-teal-500 focus:ring-teal-500 cursor-pointer"
+                  className="h-4 w-4 rounded-wasatch-sm border-wasatch-border-strong text-wasatch-accent focus:ring-wasatch-accent cursor-pointer"
         />
         <span
           className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium ${
@@ -370,34 +325,45 @@ function ProjectCardComponent({
       </div>
 
       {/* Project Name and Date */}
-      <div className="mb-4">
-        <h3 className="mb-1 text-lg font-medium text-gray-900">{project.name}</h3>
-        <p className="text-sm text-gray-500">Created {project.createdDate}</p>
+      <div className="mb-wasatch-4">
+        <h3 className="mb-wasatch-1 text-wasatch-lg font-wasatch-medium text-wasatch-text-heading">{project.name}</h3>
+        <p className="text-wasatch-sm text-wasatch-text-muted">Created {project.createdDate}</p>
       </div>
 
       {/* Project Details */}
-      <div className="mb-4 space-y-2">
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Project Manager</span>
-          <span className="font-medium text-gray-900">{project.projectManager}</span>
+      <div className="mb-wasatch-4 space-y-wasatch-2">
+        <div className="flex justify-between text-wasatch-sm">
+          <span className="text-wasatch-text-secondary">Project Manager</span>
+          <span className="font-wasatch-medium text-wasatch-text-heading">{project.projectManager}</span>
         </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Orders</span>
-          <span className="font-medium text-gray-900">{project.orders}</span>
+        <div className="flex justify-between text-wasatch-sm">
+          <span className="text-wasatch-text-secondary">Orders</span>
+          <span className="font-wasatch-medium text-wasatch-text-heading">{project.orders}</span>
         </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Batches</span>
-          <span className="font-medium text-gray-900">{project.batches}</span>
+        <div className="flex justify-between text-wasatch-sm">
+          <span className="text-wasatch-text-secondary">Batches</span>
+          <span className="font-wasatch-medium text-wasatch-text-heading">{project.batches}</span>
         </div>
       </div>
 
       {/* View Details Button */}
+      <div className="flex justify-between gap-wasatch-2">  
       <button 
         onClick={() => onProjectClick?.(project.id)}
-        className="w-full rounded-md bg-teal-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-teal-600"
+        className="w-auto rounded-wasatch-sm bg-transparent border border-wasatch-primary px-wasatch-4 py-wasatch-2 text-wasatch-sm font-wasatch-medium text-wasatch-primary cursor-pointer transition-colors hover:bg-wasatch-primary hover:text-wasatch-text-inverse"
       >
-        View Details
+        View Project
       </button>
+      <button 
+        onClick={(e) => {
+          e.stopPropagation();
+          onQuickView?.(project.id);
+        }}
+        className="w-auto rounded-wasatch-sm bg-transparent border border-wasatch-primary px-wasatch-4 py-wasatch-2 text-wasatch-sm font-wasatch-medium text-wasatch-primary cursor-pointer transition-colors hover:bg-wasatch-primary hover:text-wasatch-text-inverse"
+      >
+        Quick View
+      </button>
+    </div>
     </div>
   );
 }
@@ -408,98 +374,108 @@ function TableView({
   selectedProjects,
   onCheckboxChange,
   onProjectClick,
+  onQuickView,
 }: {
   projects: ProjectCard[];
   selectedProjects: Set<string>;
   onCheckboxChange: (id: string) => void;
   onProjectClick?: (projectId: string) => void;
+  onQuickView?: (projectId: string) => void;
 }) {
   const statusColorClasses = {
-    green: "bg-green-100 text-green-700 border-green-200",
-    blue: "bg-blue-100 text-blue-700 border-blue-200",
-    yellow: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    gray: "bg-gray-100 text-gray-700 border-gray-200",
+    green: "bg-wasatch-status-success-bg text-wasatch-status-success border-wasatch-status-success-border",
+    blue: "bg-wasatch-status-info-bg text-wasatch-status-info border-wasatch-status-info-border",
+    yellow: "bg-wasatch-status-warning-bg text-wasatch-status-warning border-wasatch-status-warning-border",
+    gray: "bg-wasatch-neutral-100 text-wasatch-text-secondary border-wasatch-border",
   };
 
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+    <div className="overflow-hidden rounded-wasatch-md border border-wasatch-border bg-wasatch-surface">
       <table className="w-full">
-        <thead className="border-b border-gray-200 bg-gray-50">
+        <thead className="border-b border-wasatch-border bg-wasatch-surface-subtle">
           <tr>
-            <th className="px-4 py-3 text-left">
+            <th className="px-wasatch-4 py-wasatch-3 text-left">
               <input
                 type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 text-teal-500 focus:ring-teal-500 cursor-pointer"
+                className="h-4 w-4 rounded-wasatch-sm border-wasatch-border-strong text-wasatch-accent focus:ring-wasatch-accent cursor-pointer"
                 onChange={() => {
                   /* Handle select all */
                 }}
               />
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+            <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
               Project Name
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+            <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
               Status
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+            <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
               Project Manager
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+            <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
               Orders
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+            <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
               Batches
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+            <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
               Created
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+            <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
               Actions
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-wasatch-border">
           {projects.map((project) => (
             <tr
               key={project.id}
-              className="hover:bg-gray-50 cursor-pointer transition-colors"
+              className="hover:bg-wasatch-surface-subtle cursor-pointer transition-colors"
               onClick={() => onProjectClick?.(project.id)}
             >
-              <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+              <td className="px-wasatch-4 py-wasatch-3" onClick={(e) => e.stopPropagation()}>
                 <input
                   type="checkbox"
                   checked={selectedProjects.has(project.id)}
                   onChange={() => onCheckboxChange(project.id)}
-                  className="h-4 w-4 rounded border-gray-300 text-teal-500 focus:ring-teal-500 cursor-pointer"
+                  className="h-4 w-4 rounded border-wasatch-border-strong text-wasatch-accent focus:ring-wasatch-accent cursor-pointer"
                 />
               </td>
-              <td className="px-4 py-3">
-                <div className="text-sm font-medium text-gray-900 hover:text-[#776FE5]">
+              <td className="px-wasatch-4 py-wasatch-3">
+                <div className="text-wasatch-sm font-wasatch-medium text-wasatch-text-heading hover:text-wasatch-primary">
                   {project.name}
                 </div>
               </td>
-              <td className="px-4 py-3">
+              <td className="px-wasatch-4 py-wasatch-3">
                 <span
-                  className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium ${
+                  className={`inline-flex items-center gap-wasatch-1 rounded-wasatch-full border px-wasatch-3 py-wasatch-1 text-wasatch-xs font-wasatch-medium ${
                     statusColorClasses[project.statusColor]
                   }`}
                 >
-                  <span className="text-xs">✓</span> {project.status}
+                  <span className="text-wasatch-xs">✓</span> {project.status}
                 </span>
               </td>
-              <td className="px-4 py-3 text-sm text-gray-600">
+              <td className="px-wasatch-4 py-wasatch-3 text-wasatch-sm text-wasatch-text-secondary">
                 {project.projectManager}
               </td>
-              <td className="px-4 py-3 text-sm text-gray-600">{project.orders}</td>
-              <td className="px-4 py-3 text-sm text-gray-600">{project.batches}</td>
-              <td className="px-4 py-3 text-sm text-gray-500">{project.createdDate}</td>
-              <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                <button
-                  onClick={() => onProjectClick?.(project.id)}
-                  className="rounded-md border border-gray-300 px-3 py-1 text-sm transition-colors hover:bg-gray-50"
-                >
-                  View Details
-                </button>
+              <td className="px-wasatch-4 py-wasatch-3 text-wasatch-sm text-wasatch-text-secondary">{project.orders}</td>
+              <td className="px-wasatch-4 py-wasatch-3 text-wasatch-sm text-wasatch-text-secondary">{project.batches}</td>
+              <td className="px-wasatch-4 py-wasatch-3 text-wasatch-sm text-wasatch-text-muted">{project.createdDate}</td>
+              <td className="px-wasatch-4 py-wasatch-3" onClick={(e) => e.stopPropagation()}>
+                <div className="flex gap-wasatch-2">
+                  <button
+                    onClick={() => onQuickView?.(project.id)}
+                    className="rounded-wasatch-sm border border-wasatch-primary px-wasatch-3 py-wasatch-1 text-wasatch-sm font-wasatch-medium text-wasatch-primary transition-colors hover:bg-wasatch-primary hover:text-wasatch-text-inverse"
+                  >
+                    Quick View
+                  </button>
+                  <button
+                    onClick={() => onProjectClick?.(project.id)}
+                    className="rounded-wasatch-sm border border-wasatch-border-strong px-wasatch-3 py-wasatch-1 text-wasatch-sm transition-colors hover:bg-wasatch-surface-subtle"
+                  >
+                    View Details
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
@@ -599,24 +575,24 @@ function KanbanColumn({
   isDragOver: boolean;
 }) {
   const colorClasses = {
-    yellow: "bg-yellow-50 border-yellow-200",
-    blue: "bg-blue-50 border-blue-200",
-    green: "bg-green-50 border-green-200",
-    gray: "bg-gray-50 border-gray-200",
+    yellow: "bg-wasatch-status-warning-bg border-wasatch-status-warning-border",
+    blue: "bg-wasatch-status-info-bg border-wasatch-status-info-border",
+    green: "bg-wasatch-status-success-bg border-wasatch-status-success-border",
+    gray: "bg-wasatch-surface-subtle border-wasatch-border",
   };
 
   const dragOverClasses = {
-    yellow: "bg-yellow-100 border-yellow-400 ring-2 ring-yellow-300",
-    blue: "bg-blue-100 border-blue-400 ring-2 ring-blue-300",
-    green: "bg-green-100 border-green-400 ring-2 ring-green-300",
-    gray: "bg-gray-100 border-gray-400 ring-2 ring-gray-300",
+    yellow: "bg-wasatch-status-warning-bg border-wasatch-status-warning ring-2 ring-wasatch-status-warning",
+    blue: "bg-wasatch-status-info-bg border-wasatch-status-info ring-2 ring-wasatch-status-info",
+    green: "bg-wasatch-status-success-bg border-wasatch-status-success ring-2 ring-wasatch-status-success",
+    gray: "bg-wasatch-neutral-100 border-wasatch-neutral-400 ring-2 ring-wasatch-neutral-300",
   };
 
   const headerColors = {
-    yellow: "bg-yellow-100 text-yellow-800",
-    blue: "bg-blue-100 text-blue-800",
-    green: "bg-green-100 text-green-800",
-    gray: "bg-gray-100 text-gray-800",
+    yellow: "bg-wasatch-status-warning-bg text-wasatch-status-warning",
+    blue: "bg-wasatch-status-info-bg text-wasatch-status-info",
+    green: "bg-wasatch-status-success-bg text-wasatch-status-success",
+    gray: "bg-wasatch-neutral-100 text-wasatch-text-heading",
   };
 
   const handleDragEnter = (e: React.DragEvent) => {
@@ -633,24 +609,24 @@ function KanbanColumn({
 
   return (
     <div className="flex-1 w-80">
-      <div className={`rounded-lg border transition-all duration-200 ${
+      <div className={`rounded-wasatch-md border transition-all duration-200 ${
         isDragOver 
-          ? 'border-[#776FE5] shadow-lg scale-[1.02]' 
-          : 'border-gray-200'
-      } bg-white`}>
+          ? 'border-wasatch-primary shadow-lg scale-[1.02]' 
+          : 'border-wasatch-border'
+      } bg-wasatch-surface`}>
         {/* Column Header */}
         <div
-          className={`flex items-center justify-between rounded-t-lg px-4 py-3 transition-all duration-200 ${
+          className={`flex items-center justify-between rounded-t-wasatch-md px-wasatch-4 py-wasatch-3 transition-all duration-200 ${
             headerColors[color as keyof typeof headerColors]
           } ${isDragOver ? 'opacity-80' : ''}`}
         >
-          <h3 className="font-medium text-sm">{title}</h3>
-          <span className="text-sm font-medium">{projects.length}</span>
+          <h3 className="font-wasatch-medium text-wasatch-sm">{title}</h3>
+          <span className="text-wasatch-sm font-wasatch-medium">{projects.length}</span>
         </div>
 
         {/* Column Content */}
         <div
-          className={`min-h-[500px] p-3 space-y-3 transition-all duration-200 ${
+          className={`min-h-[500px] p-wasatch-3 space-y-wasatch-3 transition-all duration-200 ${
             isDragOver 
               ? dragOverClasses[color as keyof typeof dragOverClasses]
               : colorClasses[color as keyof typeof colorClasses]
@@ -671,10 +647,10 @@ function KanbanColumn({
             />
           ))}
           {projects.length === 0 && (
-            <div className={`flex items-center justify-center h-32 text-sm transition-all duration-200 ${
+            <div className={`flex items-center justify-center h-32 text-wasatch-sm transition-all duration-200 ${
               isDragOver 
-                ? 'text-gray-600 font-medium scale-105' 
-                : 'text-gray-400'
+                ? 'text-wasatch-text-secondary font-wasatch-medium scale-105' 
+                : 'text-wasatch-text-placeholder'
             }`}>
               {isDragOver ? '✨ Drop here' : 'Drop projects here'}
             </div>
@@ -705,10 +681,10 @@ function KanbanCard({
       onDragStart={(e) => onDragStart(e, project.id)}
       onDragEnd={onDragEnd}
       onClick={() => !isDragging && onProjectClick?.(project.id)}
-      className={`cursor-move rounded-lg border p-4 shadow-sm transition-all duration-200 ${
+      className={`cursor-move rounded-wasatch-md border p-wasatch-4 shadow-sm transition-all duration-200 ${
         isDragging
-          ? 'opacity-40 scale-95 border-[#776FE5] bg-gray-50 rotate-2 shadow-xl'
-          : 'border-gray-200 bg-white hover:shadow-md hover:border-[#776FE5] hover:scale-[1.02] active:cursor-grabbing'
+          ? 'opacity-40 scale-95 border-wasatch-primary bg-wasatch-surface-subtle rotate-2 shadow-xl'
+          : 'border-wasatch-border bg-wasatch-surface hover:shadow-md hover:border-wasatch-primary hover:scale-[1.02] active:cursor-grabbing'
       }`}
       style={{
         transformOrigin: 'center',
@@ -717,43 +693,43 @@ function KanbanCard({
       {/* Drag Handle Indicator */}
       {!isDragging && (
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <div className="flex flex-col gap-0.5">
-            <div className="h-0.5 w-4 bg-gray-400 rounded"></div>
-            <div className="h-0.5 w-4 bg-gray-400 rounded"></div>
-            <div className="h-0.5 w-4 bg-gray-400 rounded"></div>
+            <div className="flex flex-col gap-0.5">
+            <div className="h-0.5 w-4 bg-wasatch-neutral-400 rounded"></div>
+            <div className="h-0.5 w-4 bg-wasatch-neutral-400 rounded"></div>
+            <div className="h-0.5 w-4 bg-wasatch-neutral-400 rounded"></div>
           </div>
         </div>
       )}
 
       {/* Project Name */}
-      <h4 className={`mb-2 font-medium text-sm transition-colors ${
-        isDragging ? 'text-gray-500' : 'text-gray-900'
+      <h4 className={`mb-wasatch-2 font-wasatch-medium text-wasatch-sm transition-colors ${
+        isDragging ? 'text-wasatch-text-muted' : 'text-wasatch-text-heading'
       }`}>
         {project.name}
       </h4>
 
       {/* Project Details */}
-      <div className="space-y-2 text-xs text-gray-600">
+      <div className="space-y-wasatch-2 text-wasatch-xs text-wasatch-text-secondary">
         <div className="flex justify-between">
           <span>Manager:</span>
-          <span className={`font-medium transition-colors ${
-            isDragging ? 'text-gray-500' : 'text-gray-900'
+          <span className={`font-wasatch-medium transition-colors ${
+            isDragging ? 'text-wasatch-text-muted' : 'text-wasatch-text-heading'
           }`}>
             {project.projectManager}
           </span>
         </div>
         <div className="flex justify-between">
           <span>Orders:</span>
-          <span className={`font-medium transition-colors ${
-            isDragging ? 'text-gray-500' : 'text-gray-900'
+          <span className={`font-wasatch-medium transition-colors ${
+            isDragging ? 'text-wasatch-text-muted' : 'text-wasatch-text-heading'
           }`}>
             {project.orders}
           </span>
         </div>
         <div className="flex justify-between">
           <span>Batches:</span>
-          <span className={`font-medium transition-colors ${
-            isDragging ? 'text-gray-500' : 'text-gray-900'
+          <span className={`font-wasatch-medium transition-colors ${
+            isDragging ? 'text-wasatch-text-muted' : 'text-wasatch-text-heading'
           }`}>
             {project.batches}
           </span>
@@ -761,11 +737,254 @@ function KanbanCard({
       </div>
 
       {/* Created Date */}
-      <div className={`mt-3 pt-3 border-t text-xs transition-colors ${
-        isDragging ? 'border-gray-200 text-gray-400' : 'border-gray-100 text-gray-500'
+      <div className={`mt-wasatch-3 pt-wasatch-3 border-t text-wasatch-xs transition-colors ${
+        isDragging ? 'border-wasatch-border text-wasatch-text-placeholder' : 'border-wasatch-neutral-100 text-wasatch-text-muted'
       }`}>
         Created {project.createdDate}
       </div>
+    </div>
+  );
+}
+
+// Quick View Modal Component
+function QuickViewModal({
+  projectId,
+  onClose,
+  onViewFullDetails,
+}: {
+  projectId: string;
+  onClose: () => void;
+  onViewFullDetails: () => void;
+}) {
+  const project = getProjectDetail(projectId);
+  const [isClosing, setIsClosing] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+    // Trigger open animation after a tiny delay to ensure smooth transition
+    requestAnimationFrame(() => {
+      setIsOpen(true);
+    });
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
+  useEffect(() => {
+    // Close modal on Escape key
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsClosing(true);
+        setIsOpen(false);
+        setTimeout(() => {
+          onClose();
+        }, 300);
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setIsOpen(false);
+    // Wait for animation to complete before calling onClose
+    setTimeout(() => {
+      onClose();
+    }, 300); // Match animation duration
+  };
+
+  const handleViewFullDetails = () => {
+    setIsClosing(true);
+    setIsOpen(false);
+    setTimeout(() => {
+      onViewFullDetails();
+    }, 300);
+  };
+
+  if (!project) {
+    return null;
+  }
+
+  return (
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-300 ease-out ${
+        isOpen && !isClosing ? 'opacity-100' : 'opacity-0'
+      }`}
+      onClick={handleClose}
+    >
+      <div
+        className={`relative mx-4 my-8 flex max-h-[90vh] w-full max-w-5xl flex-col rounded-wasatch-md bg-wasatch-surface shadow-2xl transition-all duration-300 ease-out ${
+          isOpen && !isClosing
+            ? 'opacity-100 translate-y-0'
+            : 'opacity-0 translate-y-12'
+        }`}
+        onClick={(e) => e.stopPropagation()}
+        style={{ fontFamily: "'Roboto', sans-serif" }}
+      >
+        {/* Modal Header */}
+        <div className="relative border-b border-wasatch-border px-wasatch-6 py-wasatch-4">
+          {/* Close Button - Top Right */}
+          <button
+            onClick={handleClose}
+            className="absolute top-wasatch-4 right-wasatch-6 rounded p-wasatch-2 text-wasatch-text-placeholder transition-colors hover:bg-wasatch-surface-subtle hover:text-wasatch-text-secondary"
+            aria-label="Close modal"
+          >
+            <X size={20} />
+          </button>
+
+          <div className="flex items-center gap-wasatch-3 pr-12">
+            <h2 className="text-wasatch-2xl font-wasatch-normal text-wasatch-text-heading">{project.name}</h2>
+            <span className="inline-flex items-center gap-wasatch-1 rounded-wasatch-full border border-wasatch-status-success-border bg-wasatch-status-success-bg px-wasatch-3 py-wasatch-1 text-wasatch-sm font-wasatch-medium text-wasatch-status-success">
+              <span className="text-wasatch-xs">✓</span> {project.status}
+            </span>
+            <p className="text-wasatch-sm text-wasatch-text-muted">{project.projectId}</p>
+          </div>
+        </div>
+
+        {/* Modal Content - Scrollable */}
+        <div className="overflow-y-auto px-wasatch-6 py-wasatch-6">
+          {/* Stats Cards */}
+          <div className="mb-wasatch-6 grid grid-cols-2 gap-wasatch-4 md:grid-cols-4">
+            <StatsCard
+              title="Total Orders"
+              value={project.stats.totalOrders.toString()}
+              secondaryHeader="Secondary Header"
+            />
+            <StatsCard
+              title="Total Batches"
+              value={project.stats.totalBatches.toString()}
+              secondaryHeader="Secondary Header"
+            />
+            <StatsCard
+              title="Total Samples"
+              value={project.stats.totalSamples.toString()}
+              secondaryHeader="Secondary Header"
+            />
+            <StatsCard
+              title="Project Completion"
+              value={`${project.stats.projectCompletion}%`}
+              secondaryHeader="Secondary Header"
+            />
+          </div>
+
+          {/* Details Section */}
+          <div className="mb-wasatch-6 rounded-wasatch-md border border-wasatch-border bg-wasatch-surface p-wasatch-6">
+            <h3 className="mb-wasatch-4 text-wasatch-xl font-wasatch-medium text-wasatch-text-heading">Details</h3>
+            <p className="mb-wasatch-6 text-wasatch-sm leading-relaxed text-wasatch-text-secondary">
+              {project.description}
+            </p>
+
+            <div className="space-y-wasatch-4">
+              <DetailRow label="Client" value={project.client} />
+              <DetailRow label="Project Manager" value={project.projectManager} />
+              <DetailRow label="Start Date" value={project.startDate} />
+              <DetailRow label="End Date" value={project.endDate} />
+              <DetailRow label="Orders" value={project.orders.toString()} />
+            </div>
+          </div>
+
+          {/* Project Members Section */}
+          <div className="rounded-wasatch-md border border-wasatch-border bg-wasatch-surface p-wasatch-6">
+            <h3 className="mb-wasatch-6 text-wasatch-xl font-wasatch-medium text-wasatch-text-heading">Project Members</h3>
+            <div className="space-y-wasatch-4">
+              {project.members.map((member) => (
+                <MemberRow key={member.id} member={member} />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="flex items-center justify-end gap-wasatch-3 border-t border-wasatch-border px-wasatch-6 py-wasatch-4">
+          <button
+            onClick={handleClose}
+            className="rounded-wasatch-sm border border-wasatch-border-strong bg-wasatch-surface px-wasatch-4 py-wasatch-2 text-wasatch-sm font-wasatch-medium text-wasatch-text-secondary transition-colors hover:bg-wasatch-surface-subtle"
+          >
+            Close
+          </button>
+          <button
+            onClick={handleViewFullDetails}
+            className="rounded-wasatch-sm bg-wasatch-primary px-wasatch-4 py-wasatch-2 text-wasatch-sm font-wasatch-medium text-wasatch-text-inverse transition-colors hover:opacity-90"
+          >
+            View Full Details
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Stats Card Component (reused from ProjectDetailPage)
+function StatsCard({
+  title,
+  value,
+  secondaryHeader,
+}: {
+  title: string;
+  value: string;
+  secondaryHeader: string;
+}) {
+  return (
+    <div className="rounded-wasatch-md border border-wasatch-border bg-wasatch-surface p-wasatch-4">
+      <div className="mb-wasatch-3 flex items-start justify-between">
+        <div className="flex-1">
+          <h4 className="text-wasatch-xs font-wasatch-medium text-wasatch-text-heading">{title}</h4>
+          <p className="text-wasatch-xs text-wasatch-text-muted">{secondaryHeader}</p>
+        </div>
+        <button className="text-wasatch-xs font-wasatch-medium text-wasatch-primary hover:text-wasatch-primary-hover">
+          View All
+        </button>
+      </div>
+      <p className="text-3xl font-bold text-wasatch-primary">{value}</p>
+    </div>
+  );
+}
+
+// Detail Row Component (reused from ProjectDetailPage)
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex border-b border-wasatch-border py-wasatch-3">
+      <span className="w-32 text-wasatch-sm font-wasatch-medium text-wasatch-text-heading">{label}</span>
+      <span className="flex-1 text-wasatch-sm text-wasatch-text-heading">{value}</span>
+    </div>
+  );
+}
+
+// Member Row Component (reused from ProjectDetailPage)
+function MemberRow({
+  member,
+}: {
+  member: {
+    name: string;
+    role: string;
+    initials: string;
+    avatarColor: string;
+    avatar?: string;
+  };
+}) {
+  return (
+    <div className="flex items-center justify-between border-b border-wasatch-border py-wasatch-4 last:border-b-0">
+      <div className="flex items-center gap-3">
+        {member.avatar ? (
+          <img
+            src={member.avatar}
+            alt={member.name}
+            className="h-10 w-10 rounded-full object-cover"
+          />
+        ) : (
+          <div
+            className="flex h-10 w-10 items-center justify-center rounded-wasatch-full text-wasatch-sm font-wasatch-medium text-wasatch-text-inverse"
+            style={{ backgroundColor: member.avatarColor }}
+          >
+            {member.initials}
+          </div>
+        )}
+        <span className="text-wasatch-sm font-wasatch-medium text-wasatch-text-heading">{member.name}</span>
+      </div>
+      <span className="text-wasatch-sm text-wasatch-text-secondary">{member.role}</span>
     </div>
   );
 }

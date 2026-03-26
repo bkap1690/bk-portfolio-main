@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Search,
   Bell,
@@ -16,7 +17,15 @@ import logo from './assets/WBL_Logo.svg';
 import { dashboardData } from './data/dashboardData';
 import { getIcon } from './utils/iconMapper';
 import ProjectsPage from './pages/ProjectsPage';
-import ProjectDetailPage from './pages/ProjectDetailPage';  
+import ProjectDetailPage from './pages/ProjectDetailPage';
+import CreateOrderPage from './pages/CreateOrderPage';
+import SpecimensPage from './pages/SpecimensPage';
+import SpecimenDetailPage from './pages/SpecimenDetailPage';
+import OrdersPage from './pages/OrdersPage';
+import OrderDetailPage from './pages/OrderDetailPage';
+import UsersPage from './pages/UsersPage';
+import ResultsPage from './pages/ResultsPage';
+import ResultDetailPage from './pages/ResultDetailPage';
 
 export default function WasatchDashboard() {
   // Load Roboto font
@@ -35,6 +44,9 @@ export default function WasatchDashboard() {
   const [expandedSidebar, setExpandedSidebar] = useState<string | null>(null);
   const [activeItem, setActiveItem] = useState<string>("home");
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [selectedSpecimenId, setSelectedSpecimenId] = useState<string | null>(null);
+  const [selectedOrderNumber, setSelectedOrderNumber] = useState<string | null>(null);
+  const [selectedResultId, setSelectedResultId] = useState<string | null>(null);
   const [navigationHistory, setNavigationHistory] = useState<Array<{ type: string; id?: string }>>([{ type: "home" }]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -43,7 +55,7 @@ export default function WasatchDashboard() {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = 0;
     }
-  }, [activeItem, selectedProjectId]);
+  }, [activeItem, selectedProjectId, selectedSpecimenId, selectedOrderNumber, selectedResultId]);
 
   // Handle browser back button
   useEffect(() => {
@@ -55,20 +67,81 @@ export default function WasatchDashboard() {
         
         setNavigationHistory(newHistory);
         
-        if (previousState.type === "project-detail") {
+        if (previousState.type === "order-detail") {
+          setSelectedOrderNumber(previousState.id || null);
+          setSelectedProjectId(null);
+          setSelectedSpecimenId(null);
+          setSelectedResultId(null);
+          setActiveItem("orders-all");
+          setExpandedSidebar("orders");
+        } else if (previousState.type === "specimen-detail") {
+          setSelectedSpecimenId(previousState.id || null);
+          setSelectedProjectId(null);
+          setSelectedOrderNumber(null);
+          setSelectedResultId(null);
+          setActiveItem("specimens");
+          setExpandedSidebar(null);
+        } else if (previousState.type === "specimens") {
+          setSelectedSpecimenId(null);
+          setSelectedProjectId(null);
+          setSelectedOrderNumber(null);
+          setSelectedResultId(null);
+          setActiveItem("specimens");
+          setExpandedSidebar(null);
+        } else if (previousState.type === "project-detail") {
           setSelectedProjectId(previousState.id || null);
+          setSelectedSpecimenId(null);
+          setSelectedOrderNumber(null);
+          setSelectedResultId(null);
           setActiveItem("projects-all");
           setExpandedSidebar("projects");
         } else if (previousState.type === "projects") {
           setSelectedProjectId(null);
+          setSelectedSpecimenId(null);
+          setSelectedOrderNumber(null);
+          setSelectedResultId(null);
           setActiveItem("projects-all");
           setExpandedSidebar("projects");
+        } else if (previousState.type === "orders-create") {
+          setSelectedProjectId(null);
+          setSelectedSpecimenId(null);
+          setSelectedOrderNumber(null);
+          setSelectedResultId(null);
+          setActiveItem("orders-create");
+          setExpandedSidebar("orders");
+        } else if (previousState.type === "orders") {
+          setSelectedProjectId(null);
+          setSelectedSpecimenId(null);
+          setSelectedOrderNumber(null);
+          setSelectedResultId(null);
+          setActiveItem("orders-all");
+          setExpandedSidebar("orders");
         } else if (previousState.type === "home") {
           setSelectedProjectId(null);
+          setSelectedSpecimenId(null);
+          setSelectedOrderNumber(null);
+          setSelectedResultId(null);
           setActiveItem("home");
+          setExpandedSidebar(null);
+        } else if (previousState.type === "result-detail") {
+          setSelectedResultId(previousState.id || null);
+          setSelectedProjectId(null);
+          setSelectedSpecimenId(null);
+          setSelectedOrderNumber(null);
+          setActiveItem("results");
+          setExpandedSidebar(null);
+        } else if (previousState.type === "results") {
+          setSelectedResultId(null);
+          setSelectedProjectId(null);
+          setSelectedSpecimenId(null);
+          setSelectedOrderNumber(null);
+          setActiveItem("results");
           setExpandedSidebar(null);
         } else {
           setSelectedProjectId(null);
+          setSelectedSpecimenId(null);
+          setSelectedOrderNumber(null);
+          setSelectedResultId(null);
           setActiveItem(previousState.type);
         }
       }
@@ -80,6 +153,9 @@ export default function WasatchDashboard() {
 
   const handleProjectClick = (projectId: string) => {
     setSelectedProjectId(projectId);
+    setSelectedSpecimenId(null);
+    setSelectedOrderNumber(null);
+    setSelectedResultId(null);
     setActiveItem("projects-all");
     setExpandedSidebar("projects");
     
@@ -89,18 +165,78 @@ export default function WasatchDashboard() {
     window.history.pushState(null, "", "");
   };
 
-  const handleBreadcrumbClick = (target: "home" | "projects" | "all-projects") => {
-    if (target === "home") {
+
+  const handleActionCardClick = (cardId: string) => {
+    if (cardId === "create-order") {
       setSelectedProjectId(null);
-      setActiveItem("home");
-      setExpandedSidebar(null);
-      setNavigationHistory([{ type: "home" }]);
-    } else if (target === "projects" || target === "all-projects") {
-      setSelectedProjectId(null);
-      setActiveItem("projects-all");
-      setExpandedSidebar("projects");
-      setNavigationHistory([{ type: "home" }, { type: "projects" }]);
+      setActiveItem("orders-create");
+      setExpandedSidebar("orders");
+      setNavigationHistory([{ type: "home" }, { type: "orders-create" }]);
     }
+    // Add handlers for other action cards as needed
+  };
+
+  const handleOrderCancel = () => {
+    setSelectedProjectId(null);
+    setSelectedSpecimenId(null);
+    setSelectedOrderNumber(null);
+    setSelectedResultId(null);
+    setActiveItem("orders-all");
+    setExpandedSidebar("orders");
+    setNavigationHistory([{ type: "home" }, { type: "orders" }]);
+  };
+
+  const handleOrderClick = (orderNumber: string) => {
+    setSelectedOrderNumber(orderNumber);
+    setSelectedProjectId(null);
+    setSelectedSpecimenId(null);
+    setSelectedResultId(null);
+    setActiveItem("orders-all");
+    setExpandedSidebar("orders");
+    
+    // Add to navigation history
+    const newHistory = [...navigationHistory, { type: "order-detail", id: orderNumber }];
+    setNavigationHistory(newHistory);
+    window.history.pushState(null, "", "");
+  };
+
+  const handleResultClick = (resultId: string) => {
+    setSelectedResultId(resultId);
+    setSelectedProjectId(null);
+    setSelectedSpecimenId(null);
+    setSelectedOrderNumber(null);
+    setActiveItem("results");
+    setExpandedSidebar(null);
+    
+    const newHistory = [...navigationHistory, { type: "result-detail", id: resultId }];
+    setNavigationHistory(newHistory);
+    window.history.pushState(null, "", "");
+  };
+
+  const handleResultsNavBack = () => {
+    setSelectedResultId(null);
+    setNavigationHistory((prev) => {
+      const next = [...prev];
+      if (next.length > 1 && next[next.length - 1].type === "result-detail") {
+        next.pop();
+      }
+      return next;
+    });
+    window.history.pushState(null, "", "");
+  };
+
+  const handleSpecimenClick = (specimenId: string) => {
+    setSelectedSpecimenId(specimenId);
+    setSelectedProjectId(null);
+    setSelectedOrderNumber(null);
+    setSelectedResultId(null);
+    setActiveItem("specimens");
+    setExpandedSidebar(null);
+    
+    // Add to navigation history
+    const newHistory = [...navigationHistory, { type: "specimen-detail", id: specimenId }];
+    setNavigationHistory(newHistory);
+    window.history.pushState(null, "", "");
   };
 
   const handleNavClick = (
@@ -114,8 +250,11 @@ export default function WasatchDashboard() {
       return;
     }
 
-    // Clear selected project when navigating
+    // Clear selected project, specimen, order, and result when navigating
     setSelectedProjectId(null);
+    setSelectedSpecimenId(null);
+    setSelectedOrderNumber(null);
+    setSelectedResultId(null);
 
     // Update navigation history
     setNavigationHistory([{ type: "home" }, { type: item }]);
@@ -149,13 +288,13 @@ export default function WasatchDashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-white" style={{ fontFamily: "'Roboto', sans-serif" }}>
+    <div className="wasatch-app flex h-screen bg-wasatch-surface font-wasatch-sans">
       {/* Sidebar */}
-      <aside className="w-[250px] flex-shrink-0 border-r border-gray-200 bg-[#F9F9F6] flex flex-col h-screen">
-        <div className="flex h-16 items-center justify-center border-b border-gray-200 bg-[#F1F1EC] p-4 flex-shrink-0">
+      <aside className="w-[250px] flex-shrink-0 border-r border-wasatch-border bg-wasatch-bg flex flex-col h-screen">
+        <div className="flex h-16 items-center justify-center border-b border-wasatch-border bg-wasatch-bg-elevated p-wasatch-4 flex-shrink-0">
           <img src={logo} alt="WASATCH.BIOLABS" className="h-12" />
         </div>
-        <nav className="p-3 overflow-y-auto flex-1">
+        <nav className="p-wasatch-3 overflow-y-auto flex-1">
           <SidebarItem
             icon={<Home size={18} />}
             label="Home"
@@ -194,6 +333,19 @@ export default function WasatchDashboard() {
             isExpanded={expandedSidebar === "orders"}
             onClick={() => handleNavClick("orders", true, "orders-all", activeItem.startsWith("orders"))}
           >
+            <SubMenuItem
+              label="Create Order"
+              active={activeItem === "orders-create"}
+              onClick={() => {
+                setSelectedProjectId(null);
+                setSelectedSpecimenId(null);
+                setSelectedOrderNumber(null);
+                setSelectedResultId(null);
+                setActiveItem("orders-create");
+                setExpandedSidebar("orders");
+                setNavigationHistory([{ type: "home" }, { type: "orders-create" }]);
+              }}
+            />
             <SubMenuItem
               label="All Orders"
               active={activeItem === "orders-all"}
@@ -243,22 +395,9 @@ export default function WasatchDashboard() {
           <SidebarItem
             icon={<BarChart3 size={18} />}
             label="Results & Reporting"
-            active={activeItem.startsWith("results")}
-            hasSubmenu
-            isExpanded={expandedSidebar === "results"}
-            onClick={() => handleNavClick("results", true, "results-view", activeItem.startsWith("results"))}
-          >
-            <SubMenuItem
-              label="View Results"
-              active={activeItem === "results-view"}
-              onClick={() => handleNavClick("results-view", false, undefined, activeItem === "results-view")}
-            />
-            <SubMenuItem
-              label="Generate Report"
-              active={activeItem === "results-generate"}
-              onClick={() => handleNavClick("results-generate", false, undefined, activeItem === "results-generate")}
-            />
-          </SidebarItem>
+            active={activeItem === "results"}
+            onClick={() => handleNavClick("results", false, undefined, activeItem === "results")}
+          />
           <SidebarItem
             icon={<Users size={18} />}
             label="User Management"
@@ -284,32 +423,43 @@ export default function WasatchDashboard() {
       {/* Main Content */}
       <div className="flex flex-1 flex-col h-screen overflow-hidden">
         {/* Top Bar */}
-        <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-[#F1F1EC] px-6 py-3 flex-shrink-0">
+        <header className="flex h-16 items-center justify-between border-b border-wasatch-border bg-wasatch-bg-elevated px-wasatch-6 py-wasatch-3 flex-shrink-0">
           <div className="max-w-full flex-1">
             <div className="relative">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 transform text-wasatch-text-placeholder"
                 size={18}
               />
               <input
                 type="text"
                 placeholder="Search for Projects, Specimens, Orders"
-                className="w-full rounded-md border border-gray-200 bg-white py-2 pl-10 pr-4 text-sm focus:border-teal-500 focus:outline-none"
+                className="w-full rounded-wasatch-sm border border-wasatch-border bg-wasatch-surface py-wasatch-2 pl-wasatch-10 pr-wasatch-4 text-wasatch-sm focus:border-wasatch-accent focus:outline-none"
               />
             </div>
           </div>
-          <div className="ml-4 flex items-center gap-3">
-            <button className="rounded-md bg-teal-500 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-teal-600 cursor-pointer">
+          <div className="ml-wasatch-4 flex items-center gap-wasatch-3">
+            <button 
+              onClick={() => {
+                setSelectedProjectId(null);
+                setSelectedSpecimenId(null);
+                setSelectedOrderNumber(null);
+                setSelectedResultId(null);
+                setActiveItem("orders-create");
+                setExpandedSidebar("orders");
+                setNavigationHistory([{ type: "home" }, { type: "orders-create" }]);
+              }}
+              className="rounded-wasatch-sm bg-wasatch-accent px-wasatch-6 py-wasatch-2 text-wasatch-sm font-wasatch-medium text-wasatch-text-inverse transition-colors hover:bg-wasatch-accent-hover cursor-pointer"
+            >
               Order Now
             </button>
-            <button className="rounded-md p-2 transition-colors hover:bg-[#E6E6E6] cursor-pointer">
-              <Bell size={20} className="text-gray-600" />
+            <button className="rounded-wasatch-sm p-wasatch-2 transition-colors hover:bg-wasatch-neutral-200 cursor-pointer">
+              <Bell size={20} className="text-wasatch-text-secondary" />
             </button>
-            <button className="rounded-md p-2 transition-colors hover:bg-[#E6E6E6] cursor-pointer">
-              <Settings size={20} className="text-gray-600" />
+            <button className="rounded-wasatch-sm p-wasatch-2 transition-colors hover:bg-wasatch-neutral-200 cursor-pointer">
+              <Settings size={20} className="text-wasatch-text-secondary" />
             </button>
-            <button className="flex h-8 w-8 items-center justify-center rounded-full bg-[#E6E6E6] transition-colors hover:bg-[#D9D9D9] cursor-pointer">
-              <span className="text-sm font-medium text-gray-700">U</span>
+            <button className="flex h-8 w-8 items-center justify-center rounded-wasatch-full bg-wasatch-neutral-200 transition-colors hover:bg-wasatch-neutral-300 cursor-pointer">
+              <span className="text-wasatch-sm font-wasatch-medium text-wasatch-text-secondary">U</span>
             </button>
           </div>
         </header>
@@ -317,30 +467,143 @@ export default function WasatchDashboard() {
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto" ref={scrollContainerRef}>
           {/* Conditional Page Rendering */}
-          {selectedProjectId ? (
-            <ProjectDetailPage projectId={selectedProjectId} onBreadcrumbClick={handleBreadcrumbClick} />
+          <AnimatePresence mode="wait">
+          {selectedResultId ? (
+            <motion.div
+              key={`result-${selectedResultId}`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+            <ResultDetailPage
+              resultId={selectedResultId}
+              onBack={handleResultsNavBack}
+              onOrderClick={handleOrderClick}
+              onSpecimenClick={handleSpecimenClick}
+            />
+            </motion.div>
+          ) : selectedOrderNumber ? (
+            <motion.div
+              key={`order-${selectedOrderNumber}`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+            <OrderDetailPage
+              orderNumber={selectedOrderNumber}
+              onResultClick={handleResultClick}
+            />
+            </motion.div>
+          ) : selectedSpecimenId ? (
+            <motion.div
+              key={`specimen-${selectedSpecimenId}`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+            <SpecimenDetailPage
+              specimenId={selectedSpecimenId}
+              onResultClick={handleResultClick}
+            />
+            </motion.div>
+          ) : selectedProjectId ? (
+            <motion.div
+              key={`project-${selectedProjectId}`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+            <ProjectDetailPage projectId={selectedProjectId} />
+            </motion.div>
+          ) : activeItem === "orders-create" ? (
+            <motion.div
+              key="orders-create"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+            <CreateOrderPage onCancel={handleOrderCancel} />
+            </motion.div>
+          ) : activeItem === "specimens" ? (
+            <motion.div
+              key="specimens"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+            <SpecimensPage onSpecimenClick={handleSpecimenClick} />
+            </motion.div>
+          ) : activeItem.startsWith("users") ? (
+            <motion.div
+              key="users"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+            <UsersPage />
+            </motion.div>
+          ) : activeItem === "results" ? (
+            <motion.div
+              key="results"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+            <ResultsPage
+              onResultClick={handleResultClick}
+            />
+            </motion.div>
+          ) : activeItem.startsWith("orders") ? (
+            <motion.div
+              key="orders"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+            <OrdersPage 
+              onOrderClick={handleOrderClick}
+              onCreateOrder={() => {
+                setSelectedProjectId(null);
+                setSelectedSpecimenId(null);
+                setSelectedOrderNumber(null);
+                setSelectedResultId(null);
+                setActiveItem("orders-create");
+                setExpandedSidebar("orders");
+                setNavigationHistory([{ type: "home" }, { type: "orders-create" }]);
+              }}
+            />
+            </motion.div>
           ) : activeItem.startsWith("projects") ? (
-            <ProjectsPage onProjectClick={handleProjectClick} onBreadcrumbClick={handleBreadcrumbClick} />
+            <motion.div
+              key="projects"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+            <ProjectsPage onProjectClick={handleProjectClick} />
+            </motion.div>
           ) : (
-            <>
-              {/* Breadcrumb */}
-              <div className="bg-white px-6 py-4">
-                <div className="flex items-center gap-2 text-sm">
-                  <span 
-                    onClick={() => handleBreadcrumbClick("home")}
-                    className="text-gray-600 cursor-pointer hover:text-gray-800 transition-colors"
-                  >
-                    Home
-                  </span>
-                  <ChevronRight size={16} className="text-gray-400" />
-                  <span className="font-medium text-gray-800">Dashboard</span>
-                </div>
-              </div>
-
+            <motion.div
+              key="home"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
               {/* Dashboard Content */}
-              <main className="px-6 py-6">
+              <main className="px-wasatch-6 py-wasatch-6">
           {/* Action Cards */}
-          <div className="mb-6 grid grid-cols-3 gap-4">
+          <div className="mb-wasatch-6 grid grid-cols-3 gap-wasatch-4">
             {dashboardData.actionCards.map((card) => (
               <ActionCard
                 key={card.id}
@@ -348,12 +611,13 @@ export default function WasatchDashboard() {
                 title={card.title}
                 description={card.description}
                 color={card.color}
+                onClick={() => handleActionCardClick(card.id)}
               />
             ))}
           </div>
 
           {/* Stats Cards */}
-          <div className="mb-6 grid grid-cols-3 gap-4">
+          <div className="mb-wasatch-6 grid grid-cols-3 gap-wasatch-4">
             {dashboardData.statsCards.map((stat) => (
               <StatsCard
                 key={stat.id}
@@ -366,10 +630,10 @@ export default function WasatchDashboard() {
 
           {/* Recent Activity */}
           <section className="mb-6">
-              <h2 className="mb-4 font-normal text-xl text-gray-900">
+              <h2 className="mb-wasatch-4 font-wasatch-normal text-wasatch-xl text-wasatch-text-heading">
               Recent Activity
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-wasatch-4">
               {dashboardData.recentActivity.map((activity) => (
                 <ActivityItem
                   key={activity.id}
@@ -386,31 +650,31 @@ export default function WasatchDashboard() {
           </section>
 
           {/* Tables Row */}
-          <div className="mb-6 grid grid-cols-2 gap-6">
+          <div className="mb-wasatch-6 grid grid-cols-2 gap-wasatch-6">
             {/* Active Projects */}
             <section>
-              <h2 className="mb-4 font-normal text-2xl text-gray-900">
+              <h2 className="mb-wasatch-4 font-wasatch-normal text-wasatch-2xl text-wasatch-text-heading">
                 Active Projects
               </h2>
-              <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+              <div className="overflow-hidden rounded-wasatch-md border border-wasatch-border bg-wasatch-surface">
                 <table className="w-full">
-                  <thead className="border-b border-gray-200 bg-gray-50">
+                  <thead className="border-b border-wasatch-border bg-wasatch-surface-subtle">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+                      <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
                         Project Name
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+                      <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
                         Status ▼
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+                      <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
                         Orders
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+                      <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="divide-y divide-wasatch-border">
                     {dashboardData.activeProjects.map((project) => (
                       <ProjectRow
                         key={project.id}
@@ -428,28 +692,28 @@ export default function WasatchDashboard() {
 
             {/* Recent Orders */}
             <section>
-              <h2 className="mb-4 font-normal text-2xl text-gray-900">
+              <h2 className="mb-wasatch-4 font-wasatch-normal text-wasatch-2xl text-wasatch-text-heading">
                 Recent Orders
               </h2>
-              <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+              <div className="overflow-hidden rounded-wasatch-md border border-wasatch-border bg-wasatch-surface">
                 <table className="w-full">
-                  <thead className="border-b border-gray-200 bg-gray-50">
+                  <thead className="border-b border-wasatch-border bg-wasatch-surface-subtle">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+                      <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
                         Order ID
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+                      <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
                         Company
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+                      <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
                         Order Status ▼
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+                      <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="divide-y divide-wasatch-border">
                     {dashboardData.recentOrders.map((order) => (
                       <OrderRow
                         key={order.id}
@@ -467,43 +731,43 @@ export default function WasatchDashboard() {
 
           {/* Recent Activity Table */}
           {/* <section className="mb-6">
-            <h2 className="mb-4 font-normal text-2xl text-gray-900">
+            <h2 className="mb-wasatch-4 font-wasatch-normal text-wasatch-2xl text-wasatch-text-heading">
               Recent Activity
             </h2>
-            <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+            <div className="overflow-hidden rounded-wasatch-md border border-wasatch-border bg-wasatch-surface">
               <table className="w-full">
-                <thead className="border-b border-gray-200 bg-gray-50">
+                <thead className="border-b border-wasatch-border bg-wasatch-surface-subtle">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+                    <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
                       Project Name
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+                    <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
                       Status ▼
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+                    <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
                       Orders
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-700">
+                    <th className="px-wasatch-4 py-wasatch-3 text-left text-wasatch-xs font-wasatch-medium uppercase text-wasatch-text-secondary">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-wasatch-border">
                   {[1, 2, 3, 4].map((i) => (
-                    <tr key={i} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm text-gray-900">
+                    <tr key={i} className="hover:bg-wasatch-surface-subtle">
+                      <td className="px-wasatch-4 py-wasatch-3 text-wasatch-sm text-wasatch-text-heading">
                         Project Name
                       </td>
-                      <td className="px-4 py-3">
-                        <span className="inline-flex items-center rounded-full border border-green-200 bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                      <td className="px-wasatch-4 py-wasatch-3">
+                        <span className="inline-flex items-center rounded-wasatch-full border border-wasatch-status-success-border bg-wasatch-status-success-bg px-wasatch-3 py-wasatch-1 text-wasatch-xs font-wasatch-medium text-wasatch-status-success">
                           ✓ Status
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-wasatch-4 py-wasatch-3 text-wasatch-sm text-wasatch-text-secondary">
                         Number of orders
                       </td>
-                      <td className="px-4 py-3">
-                        <button className="rounded-md border border-gray-300 px-3 py-1 text-sm transition-colors hover:bg-gray-50">
+                      <td className="px-wasatch-4 py-wasatch-3">
+                        <button className="rounded-wasatch-sm border border-wasatch-border-strong px-wasatch-3 py-wasatch-1 text-wasatch-sm transition-colors hover:bg-wasatch-surface-subtle">
                           View Details
                         </button>
                       </td>
@@ -516,10 +780,10 @@ export default function WasatchDashboard() {
 
           {/* Resources */}
           {/* <section className="mb-6">
-            <h2 className="mb-4 font-normal text-2xl text-gray-900">
+            <h2 className="mb-wasatch-4 font-wasatch-normal text-wasatch-2xl text-wasatch-text-heading">
               Resources
             </h2>
-            <div className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white">
+            <div className="divide-y divide-wasatch-border rounded-wasatch-md border border-wasatch-border bg-wasatch-surface">
               <ResourceItem
                 title="Contact Support"
                 description="Submit a Support Ticket, Live Chat with Support, Email & Phone Support"
@@ -549,11 +813,12 @@ export default function WasatchDashboard() {
               </main>
 
               {/* Footer */}
-              <footer className="bg-gray-800 py-4 text-center text-sm text-white">
+              <footer className="bg-wasatch-neutral-800 py-wasatch-4 text-center text-wasatch-sm text-wasatch-text-inverse">
                 © 2024 Wasatch BioLabs. All rights reserved
               </footer>
-            </>
+            </motion.div>
           )}
+          </AnimatePresence>
         </div>
       </div>
     </div>
@@ -582,19 +847,19 @@ function SidebarItem({
     <div className="mb-1">
       <button
         onClick={onClick}
-        className={`group relative flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition-all duration-200 ease-in-out ${
+        className={`group relative flex w-full items-center justify-between rounded-wasatch-sm px-wasatch-3 py-wasatch-2 text-wasatch-sm transition-all duration-200 ease-in-out ${
           active
-            ? "cursor-default font-medium text-[#776FE5] before:absolute before:bottom-0 before:left-0 before:top-0 before:w-1 before:rounded-l-md before:bg-[#776FE5] before:transition-all before:duration-200 before:content-['']"
-            : "cursor-pointer text-gray-700 hover:translate-x-0.5 hover:bg-gray-50"
+            ? "cursor-default font-wasatch-medium text-wasatch-primary before:absolute before:bottom-0 before:left-0 before:top-0 before:w-1 before:rounded-l-wasatch-sm before:bg-wasatch-primary before:transition-all before:duration-200 before:content-['']"
+            : "cursor-pointer text-wasatch-text-secondary hover:translate-x-0.5 hover:bg-wasatch-surface-subtle"
         }`}
       >
-        <div className="flex items-center gap-2 transition-transform duration-200">
+        <div className="flex items-center gap-wasatch-2 transition-transform duration-200">
           <span
-            className={`transition-transform duration-200 ${active ? "scale-110 text-[#776FE5]" : "group-hover:scale-105"}`}
+            className={`transition-transform duration-200 ${active ? "scale-110 text-wasatch-primary" : "group-hover:scale-105"}`}
           >
             {icon}
           </span>
-          <span className="text-left text-sm">{label}</span>
+          <span className="text-left text-wasatch-sm">{label}</span>
         </div>
         {hasSubmenu && (
           <ChevronRight
@@ -612,7 +877,7 @@ function SidebarItem({
             : "max-h-0 opacity-0"
         }`}
       >
-        <div className="ml-4 mt-1 space-y-1 rounded-md bg-[#F1F1EC] p-1">
+        <div className="ml-wasatch-4 mt-wasatch-1 space-y-wasatch-1 rounded-wasatch-sm bg-wasatch-bg-elevated p-wasatch-1">
           {children}
         </div>
       </div>
@@ -633,13 +898,13 @@ function SubMenuItem({
   return (
     <button
       onClick={onClick}
-      className={`animate-in fade-in slide-in-from-left-2 group relative flex w-full items-center rounded-md px-3 py-2 text-sm transition-all duration-200 ease-in-out ${
+      className={`animate-in fade-in slide-in-from-left-2 group relative flex w-full items-center rounded-wasatch-sm px-wasatch-3 py-wasatch-2 text-wasatch-sm transition-all duration-200 ease-in-out ${
         active
-          ? "cursor-default font-medium text-[#776FE5]"
-          : "cursor-pointer text-gray-600 hover:translate-x-1 hover:bg-gray-50 hover:text-gray-900"
+          ? "cursor-default font-wasatch-medium text-wasatch-primary"
+          : "cursor-pointer text-wasatch-text-secondary hover:translate-x-1 hover:bg-wasatch-surface-subtle hover:text-wasatch-text-heading"
       }`}
     >
-      <span className="text-left text-sm transition-all duration-150">
+      <span className="text-left text-wasatch-sm transition-all duration-150">
         {label}
       </span>
     </button>
@@ -652,32 +917,37 @@ function ActionCard({
   title,
   description,
   color,
+  onClick,
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
   color: string;
+  onClick?: () => void;
 }) {
   return (
-    <button className="group cursor-pointer rounded-lg border border-gray-300 bg-[#F9F9F6] hover:bg-[#F1F1EC] p-2 lg:p-4 text-left transition-all duration-200 ease-in-out hover:translate-y-[-2px] hover:shadow-lg hover:shadow-[#776FE5]/15 hover:border-[#776FE5]/30">
+    <button 
+      onClick={onClick}
+      className="group cursor-pointer rounded-wasatch-md border border-wasatch-border-strong bg-wasatch-bg hover:bg-wasatch-bg-elevated p-wasatch-2 lg:p-4 text-left transition-all duration-200 ease-in-out hover:translate-y-[-2px] hover:shadow-lg hover:shadow-wasatch-card-hover hover:border-wasatch-primary/30"
+    >
       <div className="flex items-center justify-center lg:justify-start gap-4">
         <div
-          className={`rounded-md lg:rounded-lg p-2 lg:p-3 ${
-            color === "purple" ? "bg-[#776FE5]/10" : "bg-gray-100"
+          className={`rounded-wasatch-sm lg:rounded-wasatch-md p-wasatch-2 lg:p-3 ${
+            color === "purple" ? "bg-wasatch-primary/10" : "bg-wasatch-neutral-100"
           }`}
         >
           <div
-            className={color === "purple" ? "text-[#776FE5]" : "text-gray-600"}
+            className={color === "purple" ? "text-wasatch-primary" : "text-wasatch-text-secondary"}
           >
             {icon}
           </div>
         </div>
         <div>
-          <h3 className="font-medium text-md lg:font-normal lg:text-xl text-gray-900 transition-colors group-hover:text-[#776FE5]">
+          <h3 className="font-wasatch-medium text-wasatch-base lg:font-wasatch-normal lg:text-wasatch-xl text-wasatch-text-heading transition-colors group-hover:text-wasatch-primary">
             {title}
           </h3>
           
-          <p className="text-sm text-gray-500 hidden lg:block">{description}</p>
+          <p className="text-wasatch-sm text-wasatch-text-muted hidden lg:block">{description}</p>
         </div>
       </div>
     </button>
@@ -687,16 +957,16 @@ function ActionCard({
 // Stats Card Component
 function StatsCard({ icon, value, title }: { icon: React.ReactNode; value: string; title: string; }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6">
-      <div className="mb-4 flex items-center justify-start gap-2">
-        <div className="text-gray-600">{icon}</div>
+    <div className="rounded-wasatch-md border border-wasatch-border bg-wasatch-surface p-wasatch-6">
+      <div className="mb-wasatch-4 flex items-center justify-start gap-wasatch-2">
+        <div className="text-wasatch-text-secondary">{icon}</div>
         <div className="flex-1">{title}</div>
 
-        <button className="text-sm font-medium text-[#776FE5] hover:text-[#776FE5]/80 cursor-pointer">
+        <button className="text-wasatch-sm font-wasatch-medium text-wasatch-primary hover:text-wasatch-primary-hover cursor-pointer">
           View Details
         </button>
       </div>
-      <div className="text-4xl font-bold text-gray-900">{value}</div>
+      <div className="text-wasatch-4xl font-wasatch-bold text-wasatch-text-heading">{value}</div>
     </div>
   );
 }
@@ -720,9 +990,9 @@ function ActivityItem({
   showButton?: boolean;
 }) {
   const badgeStyles = {
-    blue: "bg-blue-50 text-blue-700 border-blue-200",
-    gray: "bg-gray-100 text-gray-700 border-gray-300",
-    green: "bg-green-50 text-green-700 border-green-200",
+    blue: "bg-wasatch-status-info-bg text-wasatch-status-info border-wasatch-status-info-border",
+    gray: "bg-wasatch-neutral-100 text-wasatch-text-secondary border-wasatch-border-strong",
+    green: "bg-wasatch-status-success-bg text-wasatch-status-success border-wasatch-status-success-border",
   };
 
   const progressRef = useRef<HTMLDivElement>(null);
@@ -761,22 +1031,22 @@ function ActivityItem({
   }, [progress, hasAnimated]);
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6">
+    <div className="rounded-wasatch-md border border-wasatch-border bg-wasatch-surface p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-1 items-start gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50">
-            <div className="text-blue-600">{icon}</div>
+          <div className="flex h-12 w-12 items-center justify-center rounded-wasatch-md bg-wasatch-status-info-bg">
+            <div className="text-wasatch-status-info">{icon}</div>
           </div>
           <div className="flex-1">
             <div className="mb-2 flex items-center gap-3">
-              <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+              <h3 className="text-lg font-wasatch-medium text-wasatch-text-heading">{title}</h3>
               <span
-                className={`rounded-md border px-3 py-1 text-xs font-medium ${badgeStyles[badgeColor]}`}
+                className={`rounded-wasatch-sm border px-wasatch-3 py-wasatch-1 text-wasatch-xs font-wasatch-medium ${badgeStyles[badgeColor]}`}
               >
                 {badge}
               </span>
             </div>
-            <p className="text-sm text-gray-600">{description}</p>
+            <p className="text-wasatch-sm text-wasatch-text-secondary">{description}</p>
             {progress !== undefined && (
               <div className="mt-6" ref={progressRef}>
                 <div className="relative">
@@ -784,9 +1054,9 @@ function ActivityItem({
                   <div className="relative flex justify-between">
                     {/* Progress Line - positioned to align with dot centers */}
                     <div className="absolute inset-x-0 top-[6px] flex items-center">
-                      <div className="h-0.5 w-full bg-gray-200 mx-[6px]">
+                      <div className="h-0.5 w-full bg-wasatch-neutral-200 mx-[6px]">
                         <div
-                          className="h-full bg-[#776FE5] transition-all duration-1000 ease-out"
+                          className="h-full bg-wasatch-primary transition-all duration-1000 ease-out"
                           style={{ 
                             width: animatedProgress >= 100 ? `calc(100% - 12.5%)` : 
                                    animatedProgress >= 75 ? `calc(75% - 12.5%)` :
@@ -798,68 +1068,68 @@ function ActivityItem({
                     </div>
                     {/* Step 1 - Submitted */}
                     <div className="flex flex-col items-center w-1/4">
-                      <div className="relative mb-2 flex h-3 w-3 items-center justify-center">
+                      <div className="relative mb-wasatch-2 flex h-3 w-3 items-center justify-center">
                         {animatedProgress >= 25 && animatedProgress < 50 && (
-                          <div className="absolute h-5 w-5 animate-pulse rounded-full bg-[#776FE5] opacity-30" />
+                          <div className="absolute h-5 w-5 animate-pulse rounded-wasatch-full bg-wasatch-primary opacity-30" />
                         )}
-                        <div className={`relative z-10 h-3 w-3 rounded-full transition-all duration-500 ${animatedProgress >= 25 ? 'bg-[#776FE5]' : 'bg-gray-200'}`}>
+                        <div className={`relative z-10 h-3 w-3 rounded-wasatch-full transition-all duration-500 ${animatedProgress >= 25 ? 'bg-wasatch-primary' : 'bg-wasatch-neutral-200'}`}>
                           {animatedProgress >= 25 && animatedProgress < 50 && (
-                            <div className="absolute inset-0 -m-1 animate-pulse rounded-full ring-2 ring-[#776FE5] ring-opacity-40" />
+                            <div className="absolute inset-0 -m-1 animate-pulse rounded-wasatch-full ring-2 ring-wasatch-primary ring-opacity-40" />
                           )}
                         </div>
                       </div>
-                      <span className={`text-sm transition-all duration-500 ${animatedProgress >= 25 ? "font-medium text-[#776FE5]" : "text-gray-500"}`}>
+                      <span className={`text-wasatch-sm transition-all duration-500 ${animatedProgress >= 25 ? "font-wasatch-medium text-wasatch-primary" : "text-wasatch-text-muted"}`}>
                         Submitted
                       </span>
                     </div>
 
                     {/* Step 2 - Processing */}
                     <div className="flex flex-col items-center w-1/4">
-                      <div className="relative mb-2 flex h-3 w-3 items-center justify-center">
+                      <div className="relative mb-wasatch-2 flex h-3 w-3 items-center justify-center">
                         {animatedProgress >= 50 && animatedProgress < 75 && (
-                          <div className="absolute h-5 w-5 animate-pulse rounded-full bg-[#776FE5] opacity-30" />
+                          <div className="absolute h-5 w-5 animate-pulse rounded-wasatch-full bg-wasatch-primary opacity-30" />
                         )}
-                        <div className={`relative z-10 h-3 w-3 rounded-full transition-all duration-500 ${animatedProgress >= 50 ? 'bg-[#776FE5]' : 'bg-gray-200'}`}>
+                        <div className={`relative z-10 h-3 w-3 rounded-wasatch-full transition-all duration-500 ${animatedProgress >= 50 ? 'bg-wasatch-primary' : 'bg-wasatch-neutral-200'}`}>
                           {animatedProgress >= 50 && animatedProgress < 75 && (
-                            <div className="absolute inset-0 -m-1 animate-pulse rounded-full ring-2 ring-[#776FE5] ring-opacity-40" />
+                            <div className="absolute inset-0 -m-1 animate-pulse rounded-wasatch-full ring-2 ring-wasatch-primary ring-opacity-40" />
                           )}
                         </div>
                       </div>
-                      <span className={`text-sm transition-all duration-500 ${animatedProgress >= 50 ? "font-medium text-[#776FE5]" : "text-gray-500"}`}>
+                      <span className={`text-wasatch-sm transition-all duration-500 ${animatedProgress >= 50 ? "font-wasatch-medium text-wasatch-primary" : "text-wasatch-text-muted"}`}>
                         Processing
                       </span>
                     </div>
 
                     {/* Step 3 - Analyzing */}
                     <div className="flex flex-col items-center w-1/4">
-                      <div className="relative mb-2 flex h-3 w-3 items-center justify-center">
+                      <div className="relative mb-wasatch-2 flex h-3 w-3 items-center justify-center">
                         {animatedProgress >= 75 && animatedProgress < 100 && (
-                          <div className="absolute h-5 w-5 animate-pulse rounded-full bg-[#776FE5] opacity-30" />
+                          <div className="absolute h-5 w-5 animate-pulse rounded-wasatch-full bg-wasatch-primary opacity-30" />
                         )}
-                        <div className={`relative z-10 h-3 w-3 rounded-full transition-all duration-500 ${animatedProgress >= 75 ? 'bg-[#776FE5]' : 'bg-gray-200'}`}>
+                        <div className={`relative z-10 h-3 w-3 rounded-wasatch-full transition-all duration-500 ${animatedProgress >= 75 ? 'bg-wasatch-primary' : 'bg-wasatch-neutral-200'}`}>
                           {animatedProgress >= 75 && animatedProgress < 100 && (
-                            <div className="absolute inset-0 -m-1 animate-pulse rounded-full ring-2 ring-[#776FE5] ring-opacity-40" />
+                            <div className="absolute inset-0 -m-1 animate-pulse rounded-wasatch-full ring-2 ring-wasatch-primary ring-opacity-40" />
                           )}
                         </div>
                       </div>
-                      <span className={`text-sm transition-all duration-500 ${animatedProgress >= 75 ? "font-medium text-[#776FE5]" : "text-gray-500"}`}>
+                      <span className={`text-wasatch-sm transition-all duration-500 ${animatedProgress >= 75 ? "font-wasatch-medium text-wasatch-primary" : "text-wasatch-text-muted"}`}>
                         Analyzing
                       </span>
                     </div>
 
                     {/* Step 4 - Report Delivered */}
                     <div className="flex flex-col items-center w-1/4">
-                      <div className="relative mb-2 flex h-3 w-3 items-center justify-center">
+                      <div className="relative mb-wasatch-2 flex h-3 w-3 items-center justify-center">
                         {animatedProgress >= 100 && (
-                          <div className="absolute h-5 w-5 animate-pulse rounded-full bg-[#776FE5] opacity-30" />
+                          <div className="absolute h-5 w-5 animate-pulse rounded-wasatch-full bg-wasatch-primary opacity-30" />
                         )}
-                        <div className={`relative z-10 h-3 w-3 rounded-full transition-all duration-500 ${animatedProgress >= 100 ? 'bg-[#776FE5]' : 'bg-gray-200'}`}>
+                        <div className={`relative z-10 h-3 w-3 rounded-wasatch-full transition-all duration-500 ${animatedProgress >= 100 ? 'bg-wasatch-primary' : 'bg-wasatch-neutral-200'}`}>
                           {animatedProgress >= 100 && (
-                            <div className="absolute inset-0 -m-1 animate-pulse rounded-full ring-2 ring-[#776FE5] ring-opacity-40" />
+                            <div className="absolute inset-0 -m-1 animate-pulse rounded-wasatch-full ring-2 ring-wasatch-primary ring-opacity-40" />
                           )}
                         </div>
                       </div>
-                      <span className={`whitespace-nowrap text-sm transition-all duration-500 ${animatedProgress >= 100 ? "font-medium text-[#776FE5]" : "text-gray-500"}`}>
+                      <span className={`whitespace-nowrap text-wasatch-sm transition-all duration-500 ${animatedProgress >= 100 ? "font-wasatch-medium text-wasatch-primary" : "text-wasatch-text-muted"}`}>
                         Report Delivered
                       </span>
                     </div>
@@ -870,7 +1140,7 @@ function ActivityItem({
           </div>
         </div>
         {showButton && (
-          <button className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-50 cursor-pointer">
+          <button className="rounded-wasatch-sm border border-wasatch-border-strong px-wasatch-4 py-wasatch-2 text-wasatch-sm font-wasatch-medium transition-colors hover:bg-wasatch-surface-subtle cursor-pointer">
             View
           </button>
         )}
@@ -894,31 +1164,31 @@ function ProjectRow({
   onProjectClick: () => void;
 }) {
   const colorClasses = {
-    green: "bg-green-100 text-green-700 border-green-200",
-    yellow: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    blue: "bg-blue-100 text-blue-700 border-blue-200",
-    gray: "bg-gray-100 text-gray-700 border-gray-200",
+    green: "bg-wasatch-status-success-bg text-wasatch-status-success border-wasatch-status-success-border",
+    yellow: "bg-wasatch-status-warning-bg text-wasatch-status-warning border-wasatch-status-warning-border",
+    blue: "bg-wasatch-status-info-bg text-wasatch-status-info border-wasatch-status-info-border",
+    gray: "bg-wasatch-neutral-100 text-wasatch-text-secondary border-wasatch-border",
   };
 
   return (
-    <tr className="hover:bg-gray-50 transition-colors" onClick={onProjectClick}>
-      <td className="px-4 py-3 text-sm text-gray-900 hover:text-[#776FE5]">{name}</td>
-      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+    <tr className="hover:bg-wasatch-surface-subtle transition-colors" onClick={onProjectClick}>
+      <td className="px-wasatch-4 py-wasatch-3 text-wasatch-sm text-wasatch-text-heading hover:text-wasatch-primary">{name}</td>
+      <td className="px-wasatch-4 py-wasatch-3" onClick={(e) => e.stopPropagation()}>
         <span
-          className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${
+          className={`inline-flex items-center rounded-wasatch-full border px-wasatch-3 py-wasatch-1 text-wasatch-xs font-wasatch-medium ${
             colorClasses[statusColor as keyof typeof colorClasses]
           }`}
         >
           ✓ {status}
         </span>
       </td>
-      <td className="px-4 py-3 text-sm text-gray-600">
+      <td className="px-wasatch-4 py-wasatch-3 text-wasatch-sm text-wasatch-text-secondary">
         {orderCount} {orderCount === 1 ? 'order' : 'orders'}
       </td>
-      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+      <td className="px-wasatch-4 py-wasatch-3" onClick={(e) => e.stopPropagation()}>
         <button 
           onClick={onProjectClick}
-          className="rounded-md border cursor-pointer border-gray-300 px-3 py-1 text-sm transition-colors hover:bg-gray-50"
+          className="rounded-wasatch-sm border cursor-pointer border-wasatch-border-strong px-wasatch-3 py-wasatch-1 text-wasatch-sm transition-colors hover:bg-wasatch-surface-subtle"
         >
           View Details
         </button>
@@ -943,24 +1213,24 @@ function OrderRow({
     green: "bg-green-100 text-green-700 border-green-200",
     yellow: "bg-yellow-100 text-yellow-700 border-yellow-200",
     blue: "bg-blue-100 text-blue-700 border-blue-200",
-    gray: "bg-gray-100 text-gray-700 border-gray-200",
+    gray: "bg-wasatch-neutral-100 text-wasatch-text-secondary border-wasatch-border",
   };
 
   return (
-    <tr className="hover:bg-gray-50">
-      <td className="px-4 py-3 text-sm text-gray-900">{orderId}</td>
-      <td className="px-4 py-3 text-sm text-gray-600">{company}</td>
-      <td className="px-4 py-3">
+    <tr className="hover:bg-wasatch-surface-subtle">
+      <td className="px-wasatch-4 py-wasatch-3 text-wasatch-sm text-wasatch-text-heading">{orderId}</td>
+      <td className="px-wasatch-4 py-wasatch-3 text-wasatch-sm text-wasatch-text-secondary">{company}</td>
+      <td className="px-wasatch-4 py-wasatch-3">
         <span
-          className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${
+          className={`inline-flex items-center rounded-wasatch-full border px-wasatch-3 py-wasatch-1 text-wasatch-xs font-wasatch-medium ${
             colorClasses[statusColor as keyof typeof colorClasses]
           }`}
         >
           ✓ {status}
         </span>
       </td>
-      <td className="px-4 py-3">
-        <button className="rounded-md border border-gray-300 px-3 py-1 text-sm transition-colors hover:bg-gray-50">
+      <td className="px-wasatch-4 py-wasatch-3">
+        <button className="rounded-wasatch-sm border border-wasatch-border-strong px-wasatch-3 py-wasatch-1 text-wasatch-sm transition-colors hover:bg-wasatch-surface-subtle">
           View Details
         </button>
       </td>
@@ -984,13 +1254,13 @@ function OrderRow({
 //     <div className="">
 //       <button
 //         onClick={onToggle}
-//         className="p-4 flex w-full items-start justify-between rounded-lg text-left transition-colors hover:bg-gray-50 cursor-pointer"
+//         className="p-4 flex w-full items-start justify-between rounded-wasatch-md text-left transition-colors hover:bg-wasatch-surface-subtle cursor-pointer"
 //       >
 //         <div className="flex-1">
-//           <h4 className="mb-1 font-medium text-gray-900">{title}</h4>
-//           <p className="text-sm text-gray-600">{description}</p>
+//           <h4 className="mb-1 font-wasatch-medium text-wasatch-text-heading">{title}</h4>
+//           <p className="text-wasatch-sm text-wasatch-text-secondary">{description}</p>
 //         </div>
-//           <ChevronRight size={20} className={`flex-shrink-0 text-gray-400 ${isExpanded ? "rotate-90" : ""} transition-all duration-300 ease-in-out`} />
+//           <ChevronRight size={20} className={`flex-shrink-0 text-wasatch-text-placeholder ${isExpanded ? "rotate-90" : ""} transition-all duration-300 ease-in-out`} />
 //       </button>
 //     </div>
 //   );

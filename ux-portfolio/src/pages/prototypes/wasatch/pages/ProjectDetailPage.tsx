@@ -1,80 +1,52 @@
 import { useState } from "react";
 import { MoreVertical, Plus } from "lucide-react";
 import { getProjectDetail } from "../data/projectDetailData";
+import TabBar from "../components/TabBar";
 
 type TabType = "overview" | "orders" | "batches" | "samples" | "documents" | "activity";
 
 interface ProjectDetailPageProps {
   projectId?: string;
-  onBreadcrumbClick?: (target: "home" | "projects" | "all-projects") => void;
 }
 
-function ProjectDetailPage({ projectId = "proj-1", onBreadcrumbClick }: ProjectDetailPageProps) {
+function ProjectDetailPage({ projectId = "proj-1" }: ProjectDetailPageProps) {
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   const project = getProjectDetail(projectId);
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-white p-6" style={{ fontFamily: "'Roboto', sans-serif" }}>
-        <p className="text-gray-500">Project not found.</p>
+      <div className="min-h-screen bg-wasatch-surface p-wasatch-6" style={{ fontFamily: "'Roboto', sans-serif" }}>
+        <p className="text-wasatch-text-muted">Project not found.</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: "'Roboto', sans-serif" }}>
-      {/* Breadcrumb */}
-      <div className="border-b border-gray-200 bg-white px-6 py-4">
-        <div className="flex items-center gap-2 text-sm">
-          <span 
-            onClick={() => onBreadcrumbClick?.("home")}
-            className="text-gray-600 cursor-pointer hover:text-gray-800 transition-colors"
-          >
-            Home
-          </span>
-          <span className="text-gray-400">›</span>
-          <span 
-            onClick={() => onBreadcrumbClick?.("all-projects")}
-            className="text-gray-600 cursor-pointer hover:text-gray-800 transition-colors"
-          >
-            Projects
-          </span>
-          <span className="text-gray-400">›</span>
-          <span 
-            onClick={() => onBreadcrumbClick?.("all-projects")}
-            className="text-gray-600 cursor-pointer hover:text-gray-800 transition-colors"
-          >
-            All Projects
-          </span>
-          <span className="text-gray-400">›</span>
-          <span className="font-medium text-gray-800">Project Details</span>
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-wasatch-surface" style={{ fontFamily: "'Roboto', sans-serif" }}>
       {/* Main Content */}
-      <div className="px-6 py-6 max-w-7xl mx-auto">
+      <div className={`px-wasatch-6 py-wasatch-6 max-w-[calc(100%-(254.55px+16px))]`}>
         {/* Header */}
-        <div className="mb-6 flex items-start justify-between">
+        <div className="mb-wasatch-6 flex items-start justify-between">
           <div>
-            <div className="mb-1 flex items-center gap-3">
-              <h1 className="text-3xl font-normal text-gray-900">{project.name}</h1>
-              <span className="inline-flex items-center gap-1 rounded-full border border-green-200 bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
-                <span className="text-xs">✓</span> {project.status}
+            <div className="mb-wasatch-1 flex items-center gap-wasatch-3">
+              <h1 className="text-wasatch-3xl font-wasatch-normal text-wasatch-text-heading">{project.name}</h1>
+              <span className="inline-flex items-center gap-wasatch-1 rounded-wasatch-full border border-wasatch-status-success-border bg-wasatch-status-success-bg px-wasatch-3 py-wasatch-1 text-wasatch-sm font-wasatch-medium text-wasatch-status-success">
+                <span className="text-wasatch-xs">✓</span> {project.status}
               </span>
-              <button className="rounded p-1 hover:bg-gray-100 transition-colors">
-                <MoreVertical size={20} className="text-gray-600" />
+              <button className="rounded-wasatch-sm p-wasatch-1 hover:bg-wasatch-neutral-100 transition-colors">
+                <MoreVertical size={20} className="text-wasatch-text-secondary" />
               </button>
             </div>
-            <p className="text-sm text-gray-500">{project.projectId}</p>
+            <p className="text-wasatch-sm text-wasatch-text-muted">{project.projectId}</p>
           </div>
-          <button className="flex items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-900">
+          <button className="flex items-center gap-wasatch-2 rounded-wasatch-sm bg-wasatch-neutral-800 px-wasatch-4 py-wasatch-2 text-wasatch-sm font-wasatch-medium text-wasatch-text-inverse transition-colors hover:bg-wasatch-neutral-900">
             Add
             <Plus size={16} />
           </button>
         </div>
 
         {/* Stats Cards */}
-        <div className="mb-6 grid grid-cols-4 gap-4">
+        <div className="mb-wasatch-6 grid grid-cols-4 gap-wasatch-4">
           <StatsCard
             title="Total Orders"
             value={project.stats.totalOrders.toString()}
@@ -98,52 +70,31 @@ function ProjectDetailPage({ projectId = "proj-1", onBreadcrumbClick }: ProjectD
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 border-b border-gray-200">
-          <div className="flex gap-8">
-            <TabButton
-              label="Overview"
-              active={activeTab === "overview"}
-              onClick={() => setActiveTab("overview")}
-            />
-            <TabButton
-              label="Orders"
-              active={activeTab === "orders"}
-              onClick={() => setActiveTab("orders")}
-            />
-            <TabButton
-              label="Batches"
-              active={activeTab === "batches"}
-              onClick={() => setActiveTab("batches")}
-            />
-            <TabButton
-              label="Samples"
-              active={activeTab === "samples"}
-              onClick={() => setActiveTab("samples")}
-            />
-            <TabButton
-              label="Documents"
-              active={activeTab === "documents"}
-              onClick={() => setActiveTab("documents")}
-            />
-            <TabButton
-              label="Activity Log"
-              active={activeTab === "activity"}
-              onClick={() => setActiveTab("activity")}
-            />
-          </div>
-        </div>
+        <TabBar
+          className="mb-wasatch-6"
+          tabs={[
+            { id: "overview", label: "Overview" },
+            { id: "orders", label: "Orders" },
+            { id: "batches", label: "Batches" },
+            { id: "samples", label: "Samples" },
+            { id: "documents", label: "Documents" },
+            { id: "activity", label: "Activity Log" },
+          ]}
+          activeTab={activeTab}
+          onChange={setActiveTab}
+        />
 
         {/* Content Area */}
         {activeTab === "overview" && (
-          <div className="space-y-6">
+          <div className="space-y-wasatch-6">
             {/* Details Section */}
-            <div className="rounded-lg border border-gray-200 bg-white p-6">
-              <h2 className="mb-4 text-xl font-medium text-gray-900">Details</h2>
-              <p className="mb-6 text-sm leading-relaxed text-gray-600">
+            <div className="rounded-wasatch-md border border-wasatch-border bg-wasatch-surface p-wasatch-6">
+              <h2 className="mb-wasatch-4 text-wasatch-xl font-wasatch-medium text-wasatch-text-heading">Details</h2>
+              <p className="mb-wasatch-6 text-wasatch-sm leading-relaxed text-wasatch-text-secondary">
                 {project.description}
               </p>
 
-              <div className="space-y-4">
+              <div className="space-y-wasatch-4">
                 <DetailRow label="Client" value={project.client} />
                 <DetailRow label="Project Manager" value={project.projectManager} />
                 <DetailRow label="Start Date" value={project.startDate} />
@@ -153,9 +104,9 @@ function ProjectDetailPage({ projectId = "proj-1", onBreadcrumbClick }: ProjectD
             </div>
 
             {/* Project Members Section */}
-            <div className="rounded-lg border border-gray-200 bg-white p-6">
-              <h2 className="mb-6 text-xl font-medium text-gray-900">Project Members</h2>
-              <div className="space-y-4">
+            <div className="rounded-wasatch-md border border-wasatch-border bg-wasatch-surface p-wasatch-6">
+              <h2 className="mb-wasatch-6 text-wasatch-xl font-wasatch-medium text-wasatch-text-heading">Project Members</h2>
+              <div className="space-y-wasatch-4">
                 {project.members.map((member) => (
                   <MemberRow key={member.id} member={member} />
                 ))}
@@ -166,8 +117,8 @@ function ProjectDetailPage({ projectId = "proj-1", onBreadcrumbClick }: ProjectD
 
         {/* Placeholder for other tabs */}
         {activeTab !== "overview" && (
-          <div className="rounded-lg border border-gray-200 bg-white p-12 text-center">
-            <p className="text-gray-500">
+          <div className="rounded-wasatch-md border border-wasatch-border bg-wasatch-surface p-wasatch-12 text-center">
+            <p className="text-wasatch-text-muted">
               {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} content will be displayed here
             </p>
           </div>
@@ -188,51 +139,27 @@ function StatsCard({
   secondaryHeader: string;
 }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6">
-      <div className="mb-4 flex items-start justify-between">
+    <div className="rounded-wasatch-md border border-wasatch-border bg-wasatch-surface p-wasatch-6">
+      <div className="mb-wasatch-4 flex items-start justify-between">
         <div className="flex-1">
-          <h3 className="text-sm font-medium text-gray-900">{title}</h3>
-          <p className="text-xs text-gray-500">{secondaryHeader}</p>
+          <h3 className="text-wasatch-sm font-wasatch-medium text-wasatch-text-heading">{title}</h3>
+          <p className="text-wasatch-xs text-wasatch-text-muted">{secondaryHeader}</p>
         </div>
-        <button className="text-sm font-medium text-[#776FE5] hover:text-[#776FE5]/80">
+        <button className="text-sm font-medium text-wasatch-primary hover:text-wasatch-primary-hover">
           View All
         </button>
       </div>
-      <p className="text-4xl font-bold text-[#776FE5]">{value}</p>
+      <p className="text-wasatch-4xl font-wasatch-bold text-wasatch-primary">{value}</p>
     </div>
-  );
-}
-
-// Tab Button Component
-function TabButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`pb-3 text-sm font-medium transition-colors ${
-        active
-          ? "border-b-2 border-gray-900 text-gray-900"
-          : "text-gray-600 hover:text-gray-900"
-      }`}
-    >
-      {label}
-    </button>
   );
 }
 
 // Detail Row Component
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex border-b border-gray-200 py-3">
-      <span className="w-48 text-sm font-medium text-gray-900">{label}</span>
-      <span className="flex-1 text-sm text-gray-900">{value}</span>
+    <div className="flex border-b border-wasatch-border py-wasatch-3">
+      <span className="w-48 text-wasatch-sm font-wasatch-medium text-wasatch-text-heading">{label}</span>
+      <span className="flex-1 text-wasatch-sm text-wasatch-text-heading">{value}</span>
     </div>
   );
 }
@@ -240,8 +167,8 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 // Member Row Component
 function MemberRow({ member }: { member: { name: string; role: string; initials: string; avatarColor: string; avatar?: string } }) {
   return (
-    <div className="flex items-center justify-between border-b border-gray-200 py-4 last:border-b-0">
-      <div className="flex items-center gap-3">
+    <div className="flex items-center justify-between border-b border-wasatch-border py-wasatch-4 last:border-b-0">
+      <div className="flex items-center gap-wasatch-3">
         {member.avatar ? (
           <img
             src={member.avatar}
@@ -256,9 +183,9 @@ function MemberRow({ member }: { member: { name: string; role: string; initials:
             {member.initials}
           </div>
         )}
-        <span className="text-sm font-medium text-gray-900">{member.name}</span>
+        <span className="text-wasatch-sm font-wasatch-medium text-wasatch-text-heading">{member.name}</span>
       </div>
-      <span className="text-sm text-gray-600">{member.role}</span>
+      <span className="text-wasatch-sm text-wasatch-text-secondary">{member.role}</span>
     </div>
   );
 }

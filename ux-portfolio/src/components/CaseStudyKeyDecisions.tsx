@@ -1,90 +1,65 @@
-import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import type { CaseStudy } from "../data/caseStudies";
 
 interface CaseStudyKeyDecisionsProps {
   caseStudy: CaseStudy;
 }
 
-// Hook to handle intersection observer for scroll animations with stable once-only triggering
-function useIntersectionObserver(options = {}) {
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+const sectionReveal = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.15 },
+  transition: { duration: 0.5 },
+} as const;
 
-  useEffect(() => {
-    if (!ref.current || hasAnimated) return;
+const listVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
 
-    const observer = new IntersectionObserver(([entry]) => {
-      // Only trigger animation once when element becomes sufficiently visible
-      if (entry.isIntersecting && !hasAnimated) {
-        setHasAnimated(true);
-        // Disconnect observer after first trigger to prevent flickering
-        observer.disconnect();
-      }
-    }, {
-      threshold: 0.3, // Increase threshold for more stable triggering
-      rootMargin: '-100px 0px', // More conservative margin to prevent premature triggering
-      ...options,
-    });
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
 
-    observer.observe(ref.current);
-
-    return () => observer.disconnect();
-  }, [hasAnimated]);
-
-  return { ref, isIntersecting: hasAnimated };
-}
-
-// Individual decision component with scroll animation
-function AnimatedDecision({ 
-  decision, 
-  index 
-}: { 
-  decision: { title: string; description: string; images?: string[]; };
+function AnimatedDecision({
+  decision,
+  index,
+}: {
+  decision: { title: string; description: string; images?: string[] };
   index: number;
 }) {
-  const { ref, isIntersecting } = useIntersectionObserver();
-
   return (
-    <div 
-      ref={ref}
-      className={`py-16 lg:py-24 transition-all duration-700 ease-out ${
-        isIntersecting 
-          ? 'opacity-100 translate-y-0' 
-          : 'opacity-0 translate-y-8'
-      }`}
-    >
+    <motion.div variants={itemVariants} className="py-16 lg:py-24">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 mb-8">
-          {/* Title Column */}
           <div className="lg:pr-8">
-            <div className="text-6xl lg:text-8xl font-light text-zinc-300 dark:text-zinc-700 mb-6">
+            <div className="text-6xl lg:text-8xl font-light text-portfolio-accent mb-6">
               0{index + 1}
             </div>
-            <h3 className="text-2xl lg:text-4xl font-medium text-text-primary dark:text-text-primary leading-snug">
+            <h3 className="text-2xl lg:text-4xl font-medium text-portfolio-ink leading-snug">
               {decision.title}
             </h3>
           </div>
-          
-          {/* Description Column */}
+
           <div className="lg:pl-8">
-            <p className="text-lg text-text-primary dark:text-text-primary leading-relaxed">
+            <p className="text-lg text-portfolio-ink leading-relaxed">
               {decision.description}
             </p>
           </div>
         </div>
-        
-        {/* Full-width image */}
+
         {decision.images && decision.images.length > 0 && (
           <div className="w-full">
             <img
               src={decision.images[0]}
               alt={`${decision.title} illustration`}
-              className="w-full h-64 lg:h-96 object-cover rounded-xl bg-zinc-100 dark:bg-zinc-800"
+              className="w-full h-64 lg:h-96 object-cover rounded-xl bg-portfolio-surface"
             />
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -94,27 +69,28 @@ export default function CaseStudyKeyDecisions({ caseStudy }: CaseStudyKeyDecisio
   }
 
   return (
-    <section className="bg-white dark:bg-zinc-950">
-      {/* Header */}
-      <div className="py-16 lg:py-24">
+    <section className="bg-portfolio-page">
+      <motion.div className="py-16 lg:py-24" {...sectionReveal}>
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-text-primary dark:text-text-primary">
+          <h2 className="text-3xl lg:text-4xl font-serif italic font-bold mb-4 text-portfolio-ink">
             Key Design Decisions
           </h2>
-          <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
+          <p className="text-lg text-portfolio-muted max-w-2xl mx-auto">
             Strategic choices that shaped the user experience and drove measurable impact
           </p>
         </div>
-      </div>
+      </motion.div>
 
-      {/* All decisions with scroll animations */}
-      {caseStudy.keyDecisions.map((decision, index) => (
-        <AnimatedDecision 
-          key={index}
-          decision={decision}
-          index={index}
-        />
-      ))}
+      <motion.div
+        variants={listVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.05 }}
+      >
+        {caseStudy.keyDecisions.map((decision, index) => (
+          <AnimatedDecision key={index} decision={decision} index={index} />
+        ))}
+      </motion.div>
     </section>
   );
 }

@@ -8,7 +8,7 @@ import CaseStudyFooter from "../components/CaseStudyFooter.tsx";
 import CaseStudyKeyDecisions from "../components/CaseStudyKeyDecisions.tsx";
 import CaseStudyResearchInsights from "../components/CaseStudyResearchInsights.tsx";
 import CaseStudyWhatILearned from "../components/CaseStudyWhatILearned.tsx";
-import BentoGrid from "../components/BentoGrid.tsx";
+import PrototypeShowcase from "../components/PrototypeShowcase.tsx";
 import SuccessMetrics from "../components/SuccessMetrics.tsx";
 import ScrollspyNav from "../components/ScrollspyNav.tsx";
 
@@ -17,13 +17,12 @@ export default function CaseStudyDetail() {
   const caseStudy = caseStudies.find((c) => c.id === id);
   const navigate = useNavigate();
 
-  // Define sections for scrollspy navigation
   const sections = [
     { id: 'overview', label: 'Overview' },
-    { id: 'showcase', label: 'Showcase' },
-    ...(caseStudy?.metrics ? [{ id: 'metrics', label: 'Metrics' }] : []),
     { id: 'insights', label: 'Insights' },
     { id: 'decisions', label: 'Decisions' },
+    { id: 'showcase', label: 'Showcase' },
+    ...(caseStudy?.metrics ? [{ id: 'metrics', label: 'Metrics' }] : []),
     { id: 'learnings', label: 'Learnings' }
   ];
 
@@ -45,34 +44,50 @@ export default function CaseStudyDetail() {
 
   return (
     <motion.main
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="bg-background max-w-none py-32"
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      className="bg-background max-w-none"
     >
       <CaseStudyHero caseStudy={caseStudy} />
 
-      <div id="overview" className="mx-auto flex max-w-6xl flex-col gap-8 p-12 md:flex-row md:gap-16 md:py-24">
+      <div id="overview" className="bg-portfolio-page mx-auto flex max-w-screen-full flex-col gap-8 md:flex-row h-screen">
         <CaseStudyOverview caseStudy={caseStudy} />
         <CaseStudyMetadata caseStudy={caseStudy} />
       </div>
 
-       <div id="showcase" className="max-w-screen-full mx-auto mb-12 flex flex-col gap-8 bg-neutral-100 md:flex-row md:gap-16">
-         <BentoGrid />
-       </div>
+      <div id="insights"><CaseStudyResearchInsights caseStudy={caseStudy} /></div>
 
-       {caseStudy.metrics && <div id="metrics"><SuccessMetrics metrics={caseStudy.metrics} /></div>}
+      <div id="decisions"><CaseStudyKeyDecisions caseStudy={caseStudy} /></div>
 
-       <div id="insights"><CaseStudyResearchInsights caseStudy={caseStudy} /></div>
+      <div id="showcase">
+        <PrototypeShowcase
+          sectionNumber="04"
+          title={caseStudy.title}
+          description={caseStudy.subheadline}
+          prototypeUrl={caseStudy.prototypeUrl ?? '#'}
+          videoSrc={caseStudy.videoSrc}
+          highlights={caseStudy.highlights ? [...caseStudy.highlights] : []}
+        />
+      </div>
 
-       <div id="decisions"><CaseStudyKeyDecisions caseStudy={caseStudy} /></div>
+      {caseStudy.metrics && <div id="metrics"><SuccessMetrics metrics={caseStudy.metrics} /></div>}
 
-       <div id="learnings"><CaseStudyWhatILearned caseStudy={caseStudy} /></div>
+      <div id="learnings">
+        <CaseStudyWhatILearned
+          sectionNumber="06"
+          reflections={caseStudy.reflections ?? []}
+          intro={caseStudy.reflectionIntro ?? ''}
+          differently={caseStudy.differently ?? caseStudy.learningSummary ?? ''}
+        />
+      </div>
 
-       <CaseStudyFooter caseStudy={caseStudy} />
+      <CaseStudyFooter caseStudy={caseStudy} />
 
-       {/* Scrollspy Navigation */}
-       <ScrollspyNav sections={sections} heroHeight={600} />
+      <ScrollspyNav
+        sections={sections}
+        heroHeight={caseStudy.heroImages?.length === 3 ? window.innerHeight * 4.5 : 600}
+      />
     </motion.main>
   );
 }

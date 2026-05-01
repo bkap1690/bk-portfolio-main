@@ -17,7 +17,7 @@ export default function CaseStudyFooter({ caseStudy }: CaseStudyFooterProps) {
           </span>
         ))}
       </div>
-      <div className="mb-2 text-sm text-zinc-500">
+      <div className="mb-2 text-sm text-portfolio-muted">
         {caseStudy.date} &middot; {caseStudy.role} &middot;{" "}
         {caseStudy.tools.join(", ")}
       </div>

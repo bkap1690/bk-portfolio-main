@@ -1,151 +1,122 @@
-import { useEffect, useRef, useState } from "react";
-import type { CaseStudy } from "../data/caseStudies";
+import { motion } from "framer-motion";
 
 interface CaseStudyWhatILearnedProps {
-  caseStudy: CaseStudy;
+  reflections: Array<{ title: string; body: string }>;
+  intro: string;
+  differently: string;
+  sectionNumber: string;
 }
 
-// Hook to handle intersection observer for scroll animations
-function useIntersectionObserver(options = {}) {
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+const sectionReveal = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.15 },
+  transition: { duration: 0.5 },
+} as const;
 
-  useEffect(() => {
-    if (!ref.current || hasAnimated) return;
+const listVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
 
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !hasAnimated) {
-        setHasAnimated(true);
-        observer.disconnect();
-      }
-    }, {
-      threshold: 0.2,
-      rootMargin: '-50px 0px',
-      ...options,
-    });
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
 
-    observer.observe(ref.current);
-
-    return () => observer.disconnect();
-  }, [hasAnimated]);
-
-  return { ref, isIntersecting: hasAnimated };
-}
-
-// Individual reflection card component with animation
-function ReflectionCard({ 
-  title, 
-  body, 
-  index 
-}: { 
-  title: string; 
-  body: string; 
-  index: number;
-}) {
-  const { ref, isIntersecting } = useIntersectionObserver();
-
+export default function CaseStudyWhatILearned({
+  reflections,
+  intro,
+  differently,
+  sectionNumber,
+}: CaseStudyWhatILearnedProps) {
   return (
-    <div 
-      ref={ref}
-      className={`p-6 lg:p-8 bg-zinc-50 dark:bg-zinc-900 rounded-xl shadow-sm hover:shadow-md transition-all duration-500 ease-out ${
-        isIntersecting 
-          ? 'opacity-100 translate-y-0' 
-          : 'opacity-0 translate-y-8'
-      }`}
-      style={{ transitionDelay: `${index * 150}ms` }}
-    >
-      <h3 className="text-lg lg:text-xl font-semibold text-text-primary dark:text-text-primary mb-4">
-        {title}
-      </h3>
-      <p className="text-text-secondary dark:text-text-secondary leading-relaxed">
-        {body}
-      </p>
-    </div>
-  );
-}
-
-// Default reflections data - can be moved to caseStudies data model later
-const defaultReflections = [
-  {
-    title: "Balancing Competing Stakeholder Needs",
-    body: "I learned to mediate between the CEO's desire for detailed reporting and lab technicians' need for speed and simplicity."
-  },
-  {
-    title: "Designing for Scalability",
-    body: "By creating modular UI components and flexible data structures, I ensured the platform could evolve with new lab requirements."
-  },
-  {
-    title: "The Value of Progressive Onboarding",
-    body: "Introducing guidance only when needed kept users from feeling overwhelmed while learning a complex system."
-  }
-];
-
-export default function CaseStudyWhatILearned({ caseStudy }: CaseStudyWhatILearnedProps) {
-  // Use reflections from case study data if available, otherwise use defaults
-  const reflections = caseStudy.reflections || defaultReflections;
-  const summaryStatement = caseStudy.learningSummary || 
-    "This project reinforced the importance of deeply understanding user workflows before making major design decisions.";
-
-  const { ref: sectionRef, isIntersecting: sectionVisible } = useIntersectionObserver();
-
-  return (
-    <section className="py-16 lg:py-24 bg-background dark:bg-background">
-      <div 
-        ref={sectionRef}
-        className={`max-w-6xl mx-auto px-6 transition-all duration-700 ease-out ${
-          sectionVisible 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-0 translate-y-8'
-        }`}
-      >
-        {/* Section Header */}
-        <div className="mb-16 lg:mb-20 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-text-primary dark:text-text-primary">
-            What I Learned
-          </h2>
-        </div>
-
-        {/* Two-column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 mb-16">
-          {/* Left Column: Intro */}
-          <div className="lg:pr-8">
-            <p className="text-lg lg:text-xl text-text-secondary dark:text-text-secondary leading-relaxed">
-              Every project brings new insights and challenges that shape my approach to design. 
-              Here are the key takeaways that will inform how I tackle future UX problems.
+    <section className="bg-portfolio-page py-20 lg:py-28">
+      <div className="mx-auto max-w-6xl px-6">
+        {/* ── Header ── */}
+        <motion.div
+          className="grid grid-cols-1 gap-8 pb-10 lg:grid-cols-2 lg:gap-16"
+          {...sectionReveal}
+        >
+          <div>
+            <span className="font-mono text-xs font-medium uppercase tracking-[0.12em] text-portfolio-muted">
+              {sectionNumber} / Learnings
+            </span>
+            <h2 className="mt-3 font-serif text-3xl italic lg:text-5xl text-portfolio-ink">
+              What I Learned
+            </h2>
+          </div>
+          <div className="flex items-end">
+            <p className="text-lg font-light leading-relaxed text-portfolio-muted lg:text-xl">
+              {intro}
             </p>
           </div>
-          
-          {/* Right Column: Reflection Cards */}
-          <div className="space-y-6">
-            {reflections.map((reflection, index) => (
-              <ReflectionCard
-                key={index}
-                title={reflection.title}
-                body={reflection.body}
-                index={index}
-              />
-            ))}
-          </div>
-        </div>
+        </motion.div>
 
-        {/* Summary Callout */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-6 lg:p-8">
-          <div className="flex items-start space-x-4">
-            <div className="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mt-1">
-              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+        <div className="border-t border-portfolio-border" />
+
+        {/* ── Reflections ── */}
+        <motion.div
+          variants={listVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+        >
+          {reflections.map((reflection, i) => (
+            <motion.div key={i} variants={itemVariants}>
+              <div className="grid grid-cols-[4rem_1fr] gap-8 py-10 lg:grid-cols-[6rem_1fr] lg:gap-16 lg:py-14">
+                <motion.span
+                  className="font-serif text-5xl italic text-portfolio-accent lg:text-7xl"
+                  initial={{ opacity: 0.2 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                >
+                  {i + 1}
+                </motion.span>
+                <div>
+                  <h3 className="mb-3 text-lg font-medium text-portfolio-ink lg:text-xl">
+                    {reflection.title}
+                  </h3>
+                  <p className="text-base font-light leading-relaxed text-portfolio-muted lg:text-lg">
+                    {reflection.body}
+                  </p>
+                </div>
+              </div>
+              {i < reflections.length - 1 && (
+                <div className="border-t border-portfolio-border" />
+              )}
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* ── What I'd do differently ── */}
+        {differently && (
+          <motion.div
+            className="mt-14 overflow-hidden rounded-2xl bg-portfolio-dark lg:mt-20"
+            {...sectionReveal}
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-[4rem_1fr]">
+              <div className="hidden items-center justify-center lg:flex">
+                <span className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.12em] text-portfolio-accent [writing-mode:vertical-lr] rotate-180">
+                  If I did it again
+                </span>
+              </div>
+
+              <div className="px-8 py-10 lg:py-14 lg:pr-14 lg:pl-6">
+                <span className="font-mono text-xs font-medium uppercase tracking-[0.12em] text-white/40 lg:hidden">
+                  If I did it again
+                </span>
+                <span className="mt-1 hidden font-mono text-xs font-medium uppercase tracking-[0.12em] text-white/40 lg:inline-block">
+                  What I'd do differently
+                </span>
+                <p className="mt-4 font-serif text-xl italic leading-relaxed text-white/80 lg:text-2xl">
+                  {differently}
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                Key Takeaway
-              </h3>
-              <p className="text-blue-800 dark:text-blue-200 leading-relaxed">
-                {summaryStatement}
-              </p>
-            </div>
-          </div>
-        </div>
+          </motion.div>
+        )}
       </div>
     </section>
   );

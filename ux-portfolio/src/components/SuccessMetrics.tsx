@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 
 interface Metric {
   value: number;
@@ -69,13 +70,13 @@ function MetricCard({ metric, isInView }: { metric: Metric; isInView: boolean })
   const animatedValue = useAnimatedNumber(metric.value, isInView);
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl p-8 shadow-lg border border-zinc-200 dark:border-zinc-800 text-center">
-      <div className="text-4xl md:text-5xl font-bold text-primary dark:text-primary mb-2">
+    <div className="bg-portfolio-surface rounded-xl p-8 shadow-lg border border-portfolio-border text-center">
+      <div className="text-4xl md:text-5xl font-bold text-portfolio-muted mb-2">
         {metric.prefix || ''}
         {animatedValue.toLocaleString()}
         {metric.suffix || ''}
       </div>
-      <div className="text-lg text-text-primary dark:text-text-primary font-medium">
+      <div className="text-lg text-portfolio-ink font-medium">
         {metric.label}
       </div>
     </div>
@@ -86,12 +87,18 @@ export default function SuccessMetrics({ metrics }: SuccessMetricsProps) {
   const [ref, isInView] = useInView({ threshold: 0.3 });
 
   return (
-    <section ref={ref} className="py-16 md:py-24 bg-zinc-50 dark:bg-zinc-900">
-      <div className="max-w-6xl mx-auto px-6">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-text-primary dark:text-text-primary">
+    <section ref={ref} className="py-16 md:py-24 bg-portfolio-on-surface">
+      <motion.div
+        className="max-w-6xl mx-auto px-6"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.15 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h2 className="text-3xl md:text-4xl font-serif italic font-bold text-center mb-4 text-portfolio-on-ink">
           Impact & Results
         </h2>
-        <p className="text-lg text-center mb-12 text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
+        <p className="text-lg text-center mb-12 text-portfolio-muted max-w-2xl mx-auto">
           Measurable improvements achieved through user-centered design
         </p>
         
@@ -104,7 +111,7 @@ export default function SuccessMetrics({ metrics }: SuccessMetricsProps) {
             />
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

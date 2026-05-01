@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import type { CaseStudy } from "../data/caseStudies";
 
 interface CaseStudyResearchInsightsProps {
@@ -79,24 +80,24 @@ function StickyInsight({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           {/* Title Column */}
           <div className="lg:pr-8">
-            <div className="text-6xl lg:text-8xl font-light text-zinc-300 dark:text-zinc-700 mb-6">
+            <div className="text-6xl lg:text-8xl font-light text-portfolio-accent mb-6">
               0{index + 1}
             </div>
-            <h3 className="text-3xl lg:text-5xl font-medium text-text-primary dark:text-text-primary leading-tight">
+            <h3 className="text-3xl lg:text-5xl font-medium text-portfolio-ink leading-tight">
               {insight.title}
             </h3>
           </div>
           
           {/* Content Column */}
           <div className="lg:pl-8 flex flex-col justify-center">
-            <p className="text-xl lg:text-2xl text-text-primary dark:text-text-primary leading-relaxed mb-8">
+            <p className="text-xl lg:text-2xl text-portfolio-ink leading-relaxed mb-8">
               {insight.description}
             </p>
             
             {/* Key Findings */}
             {insight.findings && insight.findings.length > 0 && (
               <div className="space-y-4">
-                <h4 className="text-lg font-semibold text-text-primary dark:text-text-primary uppercase tracking-wider">
+                <h4 className="font-mono text-xs font-semibold uppercase tracking-widest text-portfolio-muted">
                   Key Findings
                 </h4>
                 <ul className="space-y-3">
@@ -105,8 +106,8 @@ function StickyInsight({
                       key={findingIndex}
                       className="flex items-start gap-3"
                     >
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-3 flex-shrink-0"></div>
-                      <span className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                      <div className="w-2 h-2 bg-portfolio-accent rounded-full mt-3 flex-shrink-0"></div>
+                      <span className="text-lg text-portfolio-muted leading-relaxed">
                         {finding}
                       </span>
                     </li>
@@ -174,18 +175,24 @@ export default function CaseStudyResearchInsights({ caseStudy: _caseStudy }: Cas
   const { activeSection, containerRef } = useActiveSection(researchInsights.length);
 
   return (
-    <section className="bg-white dark:bg-zinc-950">
+    <section className="bg-portfolio-surface">
       {/* Header */}
-      <div className="py-20 lg:py-28">
+      <motion.div
+        className="py-20 lg:py-28"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.15 }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-4xl lg:text-6xl font-bold mb-6 text-text-primary dark:text-text-primary">
+          <h2 className="text-4xl lg:text-6xl font-serif italic font-bold mb-6 text-portfolio-ink">
             Research & Insights
           </h2>
-          <p className="text-xl lg:text-2xl text-zinc-600 dark:text-zinc-400 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl lg:text-2xl text-portfolio-muted max-w-3xl mx-auto leading-relaxed">
             Deep user research and market analysis that uncovered critical insights and shaped our design strategy
           </p>
         </div>
-      </div>
+      </motion.div>
 
       {/* Mobile/Tablet: Normal vertical layout */}
       <div className="lg:hidden">
@@ -195,24 +202,24 @@ export default function CaseStudyResearchInsights({ caseStudy: _caseStudy }: Cas
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                 {/* Title Column */}
                 <div className="md:pr-8">
-                  <div className="text-4xl md:text-6xl font-light text-zinc-300 dark:text-zinc-700 mb-4">
+                  <div className="text-4xl md:text-6xl font-light text-portfolio-border mb-4">
                     0{index + 1}
                   </div>
-                  <h3 className="text-2xl md:text-3xl font-medium text-text-primary dark:text-text-primary leading-tight">
+                  <h3 className="text-2xl md:text-3xl font-medium text-portfolio-ink leading-tight">
                     {insight.title}
                   </h3>
                 </div>
                 
                 {/* Content Column */}
                 <div className="md:pl-8 flex flex-col justify-center">
-                  <p className="text-lg md:text-xl text-text-primary dark:text-text-primary leading-relaxed mb-6">
+                  <p className="text-lg md:text-xl text-portfolio-ink leading-relaxed mb-6">
                     {insight.description}
                   </p>
                   
                   {/* Key Findings */}
                   {insight.findings && insight.findings.length > 0 && (
                     <div className="space-y-3">
-                      <h4 className="text-sm font-semibold text-text-primary dark:text-text-primary uppercase tracking-wider">
+                      <h4 className="font-mono text-xs font-semibold uppercase tracking-widest text-portfolio-muted">
                         Key Findings
                       </h4>
                       <ul className="space-y-2">
@@ -221,8 +228,8 @@ export default function CaseStudyResearchInsights({ caseStudy: _caseStudy }: Cas
                             key={findingIndex}
                             className="flex items-start gap-3"
                           >
-                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <span className="text-base text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                            <div className="w-2 h-2 bg-portfolio-accent rounded-full mt-2 flex-shrink-0"></div>
+                            <span className="text-base text-portfolio-muted leading-relaxed">
                               {finding}
                             </span>
                           </li>
@@ -253,8 +260,8 @@ export default function CaseStudyResearchInsights({ caseStudy: _caseStudy }: Cas
                   key={index}
                   className={`w-2 h-8 rounded-full transition-all duration-500 ${
                     index === activeSection
-                      ? 'bg-blue-500'
-                      : 'bg-zinc-300 dark:bg-zinc-600'
+                      ? 'bg-portfolio-accent'
+                      : 'bg-portfolio-border'
                   }`}
                 />
               ))}

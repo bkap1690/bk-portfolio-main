@@ -1,3 +1,7 @@
+import wblDashboard from "../assets/wblDashboard.png";
+import wblCreateOrder from "../assets/wblCreateOrder.png";
+import wblSpecimenDetails from "../assets/wblSpecimenDetails.png";
+
 // CaseStudy data model and sample data for portfolio case studies
 export interface CaseStudy {
   id: string; // unique slug or id
@@ -29,13 +33,25 @@ export interface CaseStudy {
     body: string;
   }>;
   learningSummary?: string;
+  prototypeUrl?: string;
+  heroImages?: string[];
+  videoSrc?: string;
+  highlights?: [string] | [string, string] | [string, string, string];
+  reflectionIntro?: string;
+  differently?: string;
+  researchInsights?: Array<{
+    title: string;
+    description: string;
+    findings?: string[];
+  }>;
 }
 
 export const caseStudies: CaseStudy[] = [
   {
     id: 'wbl-lims',
     title: 'Wasatch BioLabs',
-    heroImage: '/images/wbl-lims.png',
+    heroImage: wblDashboard,
+    heroImages: [wblDashboard, wblCreateOrder, wblSpecimenDetails],
     subheadline: 'A fast-growing biotech startup needed a scalable, user-friendly Laboratory Information Management System (LIMS) to support rapid R&D and regulatory compliance.',
     context: `**Client:** Wasatch BioLabs`,
     challenge: `The legacy LIMS was fragmented, slow, and error-prone. Scientists struggled with data entry, tracking, and reporting, leading to workflow bottlenecks and compliance risks.`,
@@ -119,7 +135,63 @@ export const caseStudies: CaseStudy[] = [
         body: "Introducing guidance only when needed kept users from feeling overwhelmed while learning a complex system."
       }
     ],
-    learningSummary: "This project reinforced the importance of deeply understanding user workflows before making major design decisions."
+    learningSummary: "This project reinforced the importance of deeply understanding user workflows before making major design decisions.",
+    prototypeUrl: '/prototypes/wasatch',
+    videoSrc: '/videos/wbl-lims-walkthrough.mp4',
+    highlights: [
+      '45% faster data entry across all sample workflows',
+      '78% user satisfaction score post-launch',
+      '60% reduction in manual entry errors'
+    ],
+    reflectionIntro: 'Every project brings new insights and challenges that shape my approach to design. Here are the key takeaways from redesigning the Wasatch BioLabs LIMS.',
+    differently: 'I would invest more time in early-stage technical discovery with the engineering team to surface API constraints before committing to high-fidelity designs.',
+    researchInsights: [
+      {
+        title: 'User Pain Points Discovery',
+        description: 'Through comprehensive user interviews and behavioral analysis, we uncovered critical friction points in the current workflow that were significantly impacting user productivity and satisfaction.',
+        findings: [
+          '78% of users abandoned tasks due to complex navigation',
+          'Average task completion time exceeded industry benchmarks by 40%',
+          'Users reported high cognitive load during multi-step processes'
+        ]
+      },
+      {
+        title: 'Competitive Landscape Analysis',
+        description: 'A deep dive into competitor solutions revealed market gaps and opportunities for differentiation, helping us position our solution strategically within the competitive ecosystem.',
+        findings: [
+          'Market leaders focused on features over user experience',
+          'Opportunity identified for mobile-first approach',
+          'Price sensitivity varies significantly across user segments'
+        ]
+      },
+      {
+        title: 'Behavioral Pattern Insights',
+        description: 'Analytics data and user session recordings revealed unexpected usage patterns that challenged our initial assumptions and informed critical design pivots.',
+        findings: [
+          'Peak usage occurs during non-traditional hours',
+          'Mobile usage growing 150% year-over-year',
+          'Users prefer progressive disclosure over upfront complexity'
+        ]
+      },
+      {
+        title: 'Accessibility & Inclusion Research',
+        description: 'Comprehensive accessibility audits and inclusive design research ensured our solution works for users with diverse abilities and contexts of use.',
+        findings: [
+          '23% of target users rely on assistive technologies',
+          'Color contrast issues affected 15% of user base',
+          'Voice interaction preference in hands-busy scenarios'
+        ]
+      },
+      {
+        title: 'Technology Constraints & Opportunities',
+        description: 'Technical research revealed both limitations and innovative possibilities that shaped our design approach and informed feasible solution boundaries.',
+        findings: [
+          'Legacy system integration required phased approach',
+          'API limitations influenced data display strategies',
+          'Emerging technologies offered future enhancement paths'
+        ]
+      }
+    ]
   },
   // Add more case studies as needed
 ];

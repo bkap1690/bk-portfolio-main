@@ -178,7 +178,7 @@ export default function ScrollspyNav({ sections, heroHeight = 600 }: ScrollspyNa
             damping: 30,
             duration: 0.3
           }}
-          className="fixed bottom-0 inset-x-0 md:bottom-6 md:left-1/2 md:transform md:-translate-x-1/2 md:inset-x-auto z-40 bg-white/10 dark:bg-black/20 backdrop-blur-xl backdrop-saturate-150 backdrop-brightness-110 rounded-none md:rounded-full shadow-md md:shadow-lg border-0 md:border md:border-white/10 md:dark:border-white/5"
+          className="fixed bottom-0 inset-x-0 md:bottom-6 md:left-1/2 md:transform md:-translate-x-1/2 md:inset-x-auto z-40 bg-portfolio-surface/90 backdrop-blur-xl rounded-none md:rounded-full shadow-md md:shadow-lg border-0 md:border md:border-portfolio-border/50"
         >
           <div 
             ref={scrollContainerRef}
@@ -190,7 +190,7 @@ export default function ScrollspyNav({ sections, heroHeight = 600 }: ScrollspyNa
           >
             {/* Single sliding background */}
             <motion.div
-              className="absolute bg-primary rounded-full shadow-md"
+              className="absolute bg-portfolio-accent rounded-full shadow-md"
               initial={false}
               animate={{
                 left: backgroundStyle.left,
@@ -214,13 +214,13 @@ export default function ScrollspyNav({ sections, heroHeight = 600 }: ScrollspyNa
                 key={section.id}
                 ref={(el) => { buttonRefs.current[index] = el; }}
                 onClick={() => scrollToSection(section.id, index)}
-                className="relative px-4 py-2 text-sm font-medium rounded-full transition-colors duration-300 ease-out cursor-pointer z-10 whitespace-nowrap flex-shrink-0"
+                className="relative px-4 py-2 text-sm font-medium font-sans rounded-full transition-colors duration-300 ease-out cursor-pointer z-10 whitespace-nowrap flex-shrink-0"
                 aria-label={`Go to ${section.label} section`}
               >
-                <span className={`relative z-10 transition-colors duration-300 ${
+                <span className={`relative z-10 font-sans transition-colors duration-300 ${
                   activeSection === section.id 
-                    ? 'text-white' 
-                    : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary'
+                    ? 'text-portfolio-ink' 
+                    : 'text-portfolio-muted hover:text-portfolio-ink'
                 }`}>
                   {section.label}
                 </span>

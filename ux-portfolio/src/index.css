@@ -1,59 +1,72 @@
-@import url('https://fonts.cdnfonts.com/css/pp-neue-montreal');
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display:ital@0;1&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
 @import "tailwindcss";
 @import "./pages/prototypes/wasatch/theme/wasatch-theme.css";
 @import "./pages/prototypes/wasatch/theme/components.css";
+
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Theme variables */
-
+/* ── Design system tokens (source of truth) ── */
 @theme {
-  --color-primary: var(--color-primary);
-  --color-secondary: var(--color-secondary);
-  --color-bg: var(--color-bg);
-  --color-text-primary: var(--color-text-primary);
-  --color-text-secondary: var(--color-text-secondary);
-  --font-sans: 'PP Neue Montreal', sans-serif;
+  /* Palette — light mode defaults */
+  --color-portfolio-page:    hsl(45, 10%, 98%);
+  --color-portfolio-surface: hsl(45, 10%, 90%);
+  --color-portfolio-border:  hsl(45, 10%, 80%);
+  --color-portfolio-muted:   hsl(45, 10%, 50%);
+  --color-portfolio-ink:     hsl(45, 10%, 9%);
+  --color-portfolio-dark:    hsl(45, 10%, 10%);
+  --color-portfolio-accent:  hsl(45, 10%, 60%);
+  --color-portfolio-on-background:     hsl(45, 10%, 10%);
+  --color-portfolio-on-accent:     hsl(45, 10%, 60%);
+  --color-portfolio-on-ink:     hsl(45, 10%, 9%);
+  --color-portfolio-on-muted:     hsl(45, 10%, 50%);
+  --color-portfolio-on-border:     hsl(45, 10%, 80%);
+  --color-portfolio-on-surface:     hsl(45, 10%, 90%);
+  --color-portfolio-on-page:     hsl(45, 10%, 98%);
+
+  /* Semantic aliases */
+  --color-background:       var(--color-portfolio-page);
+  --color-text-primary:     var(--color-portfolio-ink);
+  --color-text-secondary:   var(--color-portfolio-muted);
+  --color-border-neutral:   var(--color-portfolio-border);
+
+  /* Typography */
+  --font-sans:  'DM Sans', sans-serif;
+  --font-serif: 'DM Serif Display', serif;
+  --font-mono:  'DM Mono', monospace;
 }
 
-/* Light theme */
-:root {
-    color-scheme: light;
-    --color-primary: #6366f1;
-    --color-secondary: #f59e42;
-    --color-background: hsl(0, 0%, 100%);
-    --color-text-primary: #3d4046;
-    --color-text-secondary: #727272;
-    --color-border-primary: #6366f1;
-    --color-border-secondary: #f59e42;
-    --color-border-neutral: #626262;
-  }
-  
-  /* Dark theme */
-  .dark {
-    color-scheme: dark;
-    --color-primary: #818cf8;
-    --color-secondary: #fb923c;
-    --color-background: #18181b; 
-    --color-text-primary: #f1f5f9;
-    --color-text-secondary: #d1d1d1;
-    --color-border-neutral: #626262;
-  }
-    
+/* ── Dark mode ── */
+.dark {
+  color-scheme: dark;
+
+  --color-portfolio-page:    hsl(45, 10%, 10%);
+  --color-portfolio-surface: hsl(45, 10%, 10%);
+  --color-portfolio-border:  hsl(45, 10%, 20%);
+  --color-portfolio-muted:   hsl(45, 10%, 50%);
+  --color-portfolio-ink:     hsl(45, 10%, 90%);
+  --color-portfolio-on-background:     hsl(45, 10%, 98%);
+  --color-portfolio-on-accent:     hsl(45, 10%, 60%);
+  --color-portfolio-on-ink:     hsl(45, 10%, 9%);
+  --color-portfolio-on-muted:     hsl(45, 10%, 50%);
+  --color-portfolio-on-border:     hsl(45, 10%, 80%);
+  --color-portfolio-on-surface:     hsl(45, 10%, 90%);
+  --color-portfolio-on-page:     hsl(45, 10%, 10%);
+}
+
 @layer base {
+  html,
   body {
-    background-color: var(--color-background);
-    color: var(--color-text);
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: var(--color-portfolio-page);
+    color: var(--color-portfolio-ink);
     font-family: var(--font-sans);
   }
 }
 
-
-.full-bleed {
-  @apply max-w-screen w-full;
-}
-
-/* Hide scrollbar for webkit browsers */
+/* ── Utilities ── */
 .overflow-x-auto::-webkit-scrollbar {
   display: none;
 }
